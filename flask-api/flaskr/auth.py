@@ -17,7 +17,7 @@ def register():
         full_name = request.json['full_name']
         user_type = request.json['user_type']
     except:
-        abort(400, "bad inputs")
+        abort(400, 'Bad Request')
 
     db = get_db()
 
@@ -25,7 +25,7 @@ def register():
     if db.execute(
         'SELECT user_id FROM user_cred WHERE username = ?', (username,)
     ).fetchone() is not None:
-        abort(400, 'User {} is already registered.'.format(username))
+        abort(400, 'Bad Request')
 
     
     # transational, the commit pushes all executed db changes
