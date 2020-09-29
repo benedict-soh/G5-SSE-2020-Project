@@ -3,6 +3,7 @@ import os
 
 from flask import Flask
 from . import test_page
+from . import auth
 
 
 # this file is the main dirver for flask.
@@ -16,6 +17,7 @@ def create_app(test_config=None):
     )
     app.config["DEBUG"] = True
     app.register_blueprint(test_page.simple_page)
+    app.register_blueprint(auth.bp)
 
     if test_config is None:
         # load the instance config, if it exists, when not testing
