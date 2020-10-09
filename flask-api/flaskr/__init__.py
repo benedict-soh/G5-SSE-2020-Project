@@ -1,9 +1,10 @@
 import os
-# add more blue prints here. "project" is the directory, "test_page" is the file name, "simple_page" is the blueprint object.
-
 from flask import Flask
 from . import test_page
 from . import auth
+import os
+from flask_jwt_extended import JWTManager
+
 
 
 # this file is the main dirver for flask.
@@ -11,13 +12,26 @@ def create_app(test_config=None):
         
     # create the application
     app = Flask(__name__, instance_relative_config=True)
+
+    # add more configs here
     app.config.from_mapping(
         SECRET_KEY='dev',
         DATABASE=os.path.join(app.instance_path, 'flaskr.sqlite'),
     )
     app.config["DEBUG"] = True
+    app.config['JWT_SECRET_KEY'] =  os.environ['FLASK_SECRET_KEY']
+    app.config['JWT_TOKEN_LOCATION'] = ['cookies']
+    app.config['JWT_COOKIE_CSRF_PROTECT'] = True
+
+
+    # add more blue prints here. "test_page" is the file name, "simple_page" is the blueprint object.
     app.register_blueprint(test_page.simple_page)
     app.register_blueprint(auth.bp)
+
+
+    # setting up JWT manager
+    jwt = JWTManager(app)
+  
 
     if test_config is None:
         # load the instance config, if it exists, when not testing

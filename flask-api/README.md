@@ -27,3 +27,9 @@ Note: the db is SQLite
 All setup/config are based on the official flask documentation, see more here: https://flask.palletsprojects.com/en/1.1.x/tutorial/layout/
 
 Fun DB related reading material (injection free): https://flask.palletsprojects.com/en/1.1.x/patterns/sqlite3/
+
+
+## API doc
+See `API_endpoint.md` for all currently supported API. 
+
+I swear to god if anyone ask me on discord what are the endpoints i will physically delete them IRL.
