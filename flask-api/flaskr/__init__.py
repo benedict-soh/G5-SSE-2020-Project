@@ -1,15 +1,15 @@
 import os
 from flask import Flask
-from . import test_page
-from . import auth
-import os
+from . import (
+    test_page, auth, voting_event
+)
 from flask_jwt_extended import JWTManager
 
 
 
 # this file is the main dirver for flask.
 def create_app(test_config=None):
-        
+
     # create the application
     app = Flask(__name__, instance_relative_config=True)
 
@@ -21,17 +21,18 @@ def create_app(test_config=None):
     app.config["DEBUG"] = True
     app.config['JWT_SECRET_KEY'] =  os.environ['FLASK_SECRET_KEY']
     app.config['JWT_TOKEN_LOCATION'] = ['cookies']
-    app.config['JWT_COOKIE_CSRF_PROTECT'] = True
+    app.config['JWT_COOKIE_CSRF_PROTECT'] = False
 
 
     # add more blue prints here. "test_page" is the file name, "simple_page" is the blueprint object.
     app.register_blueprint(test_page.simple_page)
     app.register_blueprint(auth.bp)
+    app.register_blueprint(voting_event.bp)
 
 
     # setting up JWT manager
     jwt = JWTManager(app)
-  
+
 
     if test_config is None:
         # load the instance config, if it exists, when not testing
