@@ -1,7 +1,7 @@
 import os
 from flask import Flask
 from . import (
-    test_page, auth, voting_event
+    test_page, auth, candidate, voting_event
 )
 from flask_jwt_extended import JWTManager
 
@@ -28,6 +28,7 @@ def create_app(test_config=None):
     app.register_blueprint(test_page.simple_page)
     app.register_blueprint(auth.bp)
     app.register_blueprint(voting_event.bp)
+    app.register_blueprint(candidate.bp)
 
 
     # setting up JWT manager
