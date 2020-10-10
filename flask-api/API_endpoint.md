@@ -52,3 +52,77 @@ Will strip away both of the provided Cookies.
 `/auth/test` methods=['POST', 'GET']
 
 Will require a valid JWT Cookie and the CSRF header (See login for CSRF example).
+
+## Voting Event Endpoints:
+
+### Create
+
+`/voting-events/create` methods=['POST']
+
+Requires a JSON object with the following fields:
+```json
+{
+    "event_name" : "a string",
+    "year" : "a year, e.g. 2020",
+    "vote_start" : "a date in the format of 'YY-MM-DD'",
+    "vote_end" : "a date in the format of 'YY-MM-DD'"
+}
+```
+
+Returns 204 upon success.
+
+If the date format needs to be changed, ping me (Ben) on Discord.
+
+### Get by ID
+
+`/voting-events/{voting-event-ID}` methods=['GET']
+
+Returns 200 with a JSON object with the following fields:
+```json
+{
+    "id" : "an integer",
+    "event_name" : "a string",
+    "year" : "a year, e.g. 2020",
+    "vote_start" : "a date in the format of 'YY-MM-DD HH:MM:SS'",
+    "vote_end" : "a date in the format of 'YY-MM-DD HH:MM:SS'"
+}
+```
+
+### Get All
+
+`/voting-events` methods=['GET']
+
+Returns 200 with a **list** of JSON objects such as:
+```json
+[
+  {
+      "id" : "an integer",
+      "event_name" : "a string",
+      "year" : "a year, e.g. 2020",
+      "vote_start" : "a date in the format of 'YY-MM-DD HH:MM:SS'",
+      "vote_end" : "a date in the format of 'YY-MM-DD HH:MM:SS'"
+  }
+]
+```
+
+### Update
+
+`/voting-events/{voting-event-ID}/create` methods=['PUT']
+
+Requires a JSON object with the following fields:
+```json
+{
+    "event_name" : "a string",
+    "year" : "a year, e.g. 2020",
+    "vote_start" : "a date in the format of 'YY-MM-DD'",
+    "vote_end" : "a date in the format of 'YY-MM-DD'"
+}
+```
+
+Returns 204 upon success.
+
+### Delete
+
+`/voting-events/{voting-event-ID}/delete` methods=['DELETE']
+
+Returns 204 upon success.
