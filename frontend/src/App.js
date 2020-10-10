@@ -3,6 +3,7 @@ import NavigationTopBar from './navigation/NavigationTopBar'
 import {Route, withRouter, Switch} from "react-router-dom";
 import './App.css';
 import voterRoutes from "./routes/voterRoutes";
+import EventForm from "./test/voteEventForm"
 
 class App extends Component {
     render() {
@@ -11,6 +12,7 @@ class App extends Component {
                 <NavigationTopBar/>
                     <Switch>
                         <Route strict path="/vote" component={voterRoutes}/>
+                        <Route strict path="/test" component={EventForm}/>
                     </Switch>
                     <a
                         className="App-link"
