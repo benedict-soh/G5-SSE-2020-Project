@@ -4,10 +4,10 @@ import {Route, withRouter, Switch} from "react-router-dom";
 import '../App.css';
 
 const EventForm = () =>{
-	const [eventName, setEventName] = useState("");
-	const [eventYear, setEventYear] = useState("");
-	const [voteStart, setVoteStart] = useState("");
-	const [voteEnd, setVoteEnd] = useState("");
+	const [event_name, setEventName] = useState("");
+	const [year, setEventYear] = useState("");
+	const [vote_start, setVoteStart] = useState("");
+	const [vote_end, setVoteEnd] = useState("");
 
 	return(
 			<form>
@@ -16,7 +16,7 @@ const EventForm = () =>{
 						<input
 							id="event_name"
 							type="text"
-							value={eventName}
+							value={event_name}
 							onChange={(event) => setEventName(event.target.value)}
 							placeholder="Event Name"
 							required />
@@ -24,7 +24,7 @@ const EventForm = () =>{
 						<input
 							id="year"
 							type="number"
-							value={eventYear}
+							value={year}
 							onChange={(event) => setEventYear(event.target.value)}
 							placeholder="2020"
 							required />
@@ -32,17 +32,39 @@ const EventForm = () =>{
 						<input
 							id="vote_start"
 							type="date"
-							value={voteStart}
+							value={vote_start}
 							onChange={(event) => setVoteStart(event.target.value)}
 							required />
 						<label for="vote_end">Vote End Date:</label>
 						<input
 							id="vote_end"
 							type="date"
-							value={voteEnd}
+							value={vote_end}
 							onChange={(event) => setVoteEnd(event.target.value)}
 							required />
-						<input type="submit" value="Submit Voting Event" />
+						<button type="submit" onClick={async () => {
+							const newEvent = {event_name, year, vote_start, vote_end};
+							newEvent.vote_start = ('20-11-15');
+							newEvent.vote_end = ('20-11-16');
+							console.log(newEvent);
+							console.log(JSON.stringify(newEvent));
+							const response = await fetch("/voting-events/create", {
+								method: "POST",
+	              headers: {
+	                "Content-Type": "application/json"
+	              },
+	              body: JSON.stringify(newEvent)
+	            });
+							console.log(response);
+
+							console.log(newEvent);
+							if(response.ok) {
+								console.log("Created event");
+							} else {
+								console.log("Didnt create event");
+							}
+						}}>
+						Submit Event</button>
 			</form>
 		)
 }

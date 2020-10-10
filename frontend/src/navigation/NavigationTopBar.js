@@ -66,7 +66,8 @@ export default function NavigationTopBar(props) {
                         <NavigationBarOption label={"Home"} to={"/"} />
                         <NavigationBarOption label={"For Voters"} to={"/vote"} />
                         <NavigationBarOption label={"For Parties"} to={"/parties"} />
-                        <NavigationBarOption label={"For Testing"} to={"/test"} />
+                        <NavigationBarOption label={"Event Creation Page"} to={"/event/create"} />
+                        <NavigationBarOption label={"Event View Page"} to={"/event"} />
                     </Tabs>
                 </Toolbar>
             </div>
