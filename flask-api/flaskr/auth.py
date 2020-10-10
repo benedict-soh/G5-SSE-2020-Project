@@ -28,13 +28,13 @@ def register():
 
     db = get_db()
 
-    # check for duplicate username 
+    # check for duplicate username
     if db.execute(
         'SELECT user_id FROM user_cred WHERE username = ?', (username,)
     ).fetchone() is not None:
         abort(400, 'Bad Request')
 
-    
+
     # transational, the commit pushes all executed db changes
     c = db.execute(
         'INSERT INTO user (full_name, user_type) VALUES (?, ?)',
@@ -65,9 +65,9 @@ def login():
     ).fetchone()
 
     if user is None:
-        abort(400, 'Incorrect username.')
+        abort(400, 'The username or password was incorrect')
     elif not check_password_hash(user['password'], password):
-        abort(400, 'Incorrect password.')
+        abort(400, 'The username or password was incorrect')
 
     # do JWT stuff here
     access_token = create_access_token(identity=username)
