@@ -52,7 +52,7 @@ def get(voting_event_id):
     resp.headers['Content-Type'] = 'application/json'
     return resp
 
-@bp.route('/', methods=['GET'])
+@bp.route('', methods=['GET'])
 @jwt_required
 def getList():
     db = get_db()
