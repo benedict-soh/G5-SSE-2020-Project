@@ -9,7 +9,7 @@ export async function login_request(username, password) {
     const response = await axios.post(
         BaseUrl + loginAPI,
         {"username" : username, "password" : password},
-        {headers:{"Content-Type": "application/json"}}
+        {headers:{"Content-Type": "application/json", "Access-Control-Allow-Origin": "*"}}
         )
     return response.data
 }

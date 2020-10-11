@@ -102,7 +102,7 @@ export default function NavigationTopBar(props) {
                 <div className={classes.logoWrapper}>
                     <img src="https://aec.gov.au/_template/css/img/aec-logo-homepage.png" alt="logo" className={classes.logo}/>
                 </div>
-                <Toolbar className={classes.tab}>
+                <Toolbar value= {false} className={classes.tab}>
                     <Tabs className={classes.tabs} fullWidth={true}>
                         <NavigationBarOption label={"Home"} to={"/"} />
                         <NavigationBarOption label={"For Voters"} to={"/vote"} />
