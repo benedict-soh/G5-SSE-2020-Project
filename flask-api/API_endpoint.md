@@ -64,8 +64,8 @@ Requires a JSON object with the following fields:
 {
     "event_name" : "a string",
     "year" : "a year, e.g. 2020",
-    "vote_start" : "a date in the format of 'YY-MM-DD'",
-    "vote_end" : "a date in the format of 'YY-MM-DD'"
+    "vote_start" : "a date in the format of 'YYYY-MM-DD'",
+    "vote_end" : "a date in the format of 'YYYY-MM-DD'"
 }
 ```
 
@@ -83,8 +83,8 @@ Returns 200 with a JSON object with the following fields:
     "id" : "an integer",
     "event_name" : "a string",
     "year" : "a year, e.g. 2020",
-    "vote_start" : "a date in the format of 'YY-MM-DD HH:MM:SS'",
-    "vote_end" : "a date in the format of 'YY-MM-DD HH:MM:SS'"
+    "vote_start" : "a date in the format of 'YYYY-MM-DD HH:MM:SS'",
+    "vote_end" : "a date in the format of 'YYYY-MM-DD HH:MM:SS'"
 }
 ```
 
@@ -99,8 +99,8 @@ Returns 200 with a **list** of JSON objects such as:
       "id" : "an integer",
       "event_name" : "a string",
       "year" : "a year, e.g. 2020",
-      "vote_start" : "a date in the format of 'YY-MM-DD HH:MM:SS'",
-      "vote_end" : "a date in the format of 'YY-MM-DD HH:MM:SS'"
+      "vote_start" : "a date in the format of 'YYYY-MM-DD HH:MM:SS'",
+      "vote_end" : "a date in the format of 'YYYY-MM-DD HH:MM:SS'"
   }
 ]
 ```
@@ -114,8 +114,8 @@ Requires a JSON object with the following fields:
 {
     "event_name" : "a string",
     "year" : "a year, e.g. 2020",
-    "vote_start" : "a date in the format of 'YY-MM-DD'",
-    "vote_end" : "a date in the format of 'YY-MM-DD'"
+    "vote_start" : "a date in the format of 'YYYY-MM-DD'",
+    "vote_end" : "a date in the format of 'YYYY-MM-DD'"
 }
 ```
 
