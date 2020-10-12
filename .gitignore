@@ -12,5 +12,3 @@ __pycache__
 env.sh
 migrations
 *.idea
-
-**/yarn.lock
