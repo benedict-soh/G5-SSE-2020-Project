@@ -7,7 +7,7 @@ import json
 bp = Blueprint('voting_events', __name__, url_prefix='/voting-events')
 
 @bp.route('/create', methods=['POST'])
-# @jwt_required
+@jwt_required
 def create():
     if not(request.data):
         abort(400, 'Bad Request')
@@ -32,7 +32,7 @@ def create():
     return '', 204
 
 @bp.route('/<int:voting_event_id>', methods=['GET'])
-# @jwt_required
+@jwt_required
 def get(voting_event_id):
     db = get_db()
     cursor = db.cursor()
@@ -53,7 +53,7 @@ def get(voting_event_id):
     return resp
 
 @bp.route('', methods=['GET'])
-# @jwt_required
+@jwt_required
 def getList():
     db = get_db()
     cursor = db.cursor()
@@ -77,7 +77,7 @@ def getList():
     return resp
 
 @bp.route('/<int:voting_event_id>/update', methods=['PUT'])
-# @jwt_required
+@jwt_required
 def update(voting_event_id):
     if not(request.data):
         abort(400, 'Bad Request')
@@ -111,7 +111,7 @@ def update(voting_event_id):
     return '', 204
 
 @bp.route('/<int:voting_event_id>/delete', methods=['DELETE'])
-# @jwt_required
+@jwt_required
 def delete(voting_event_id):
     db = get_db()
 
