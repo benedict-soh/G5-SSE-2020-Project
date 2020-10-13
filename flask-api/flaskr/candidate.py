@@ -36,6 +36,13 @@ def create():
         if party is None:
             abort(400, 'Bad Request')
 
+        # Check member count and order
+        candidates = db.execute(
+            'SELECT * FROM candidate WHERE party_id = ?',
+            (party_id,)
+        ).fetchall()
+        count = len(candidates)
+
     # Check if the Voting Event exists
     v_event = db.execute(
         'SELECT * FROM voting_event WHERE id = ?', (v_event_id,)
@@ -43,13 +50,6 @@ def create():
 
     if v_event is None:
         abort(400, 'Bad Request')
-
-    # Check member count and order
-    candidates = db.execute(
-        'SELECT * FROM candidate WHERE party_id = ?',
-        (party_id,)
-    ).fetchall()
-    count = len(candidates)
 
     if candidate_order != None and candidate_order > count:
         candidate_order = count + 1
@@ -65,9 +65,6 @@ def create():
             'UPDATE candidate SET candidate_order = ? WHERE id = ?',
             (count + 1, change_id)
         )
-
-    # Format exclude boolean
-    exclude = exclude.lower() in ['true', '1']
 
     # Save to DB
     db.execute(
@@ -192,6 +189,13 @@ def update(candidate_id):
         if party is None:
             abort(400, 'Bad Request')
 
+        # Check member count and order
+        candidates = db.execute(
+            'SELECT * FROM candidate WHERE party_id = ?',
+            (party_id,)
+        ).fetchall()
+        count = len(candidates)
+
     # Check if the Voting Event exists
     v_event = db.execute(
         'SELECT * FROM voting_event WHERE id = ?', (v_event_id,)
@@ -200,30 +204,8 @@ def update(candidate_id):
     if v_event is None:
         abort(400, 'Bad Request')
 
-    # Check member count and order
-    candidates = db.execute(
-        'SELECT * FROM candidate WHERE party_id = ?',
-        (party_id,)
-    ).fetchall()
-    count = len(candidates)
-
     if candidate_order != None and candidate_order > count:
-        candidate_order = count + 1
-    elif candidate_order != None and candidate_order < count:
-        change_candidate = db.execute(
-            'SELECT * FROM candidate WHERE party_id = ? AND candidate_order = ?',
-            (party_id, candidate_order)
-        ).fetchone()
-
-        change_id = change_candidate['id']
-
-        db.execute(
-            'UPDATE candidate SET candidate_order = ? WHERE id = ?',
-            (count + 1, change_id)
-        )
-
-    # Format exclude boolean
-    exclude = exclude.lower() in ['true', '1']
+        abort(400, 'Bad Request: Invalid number') # IDK if there's a better message, but this is here just for debugging purposes if someone spaghets
 
     # Update DB
     db.execute(
