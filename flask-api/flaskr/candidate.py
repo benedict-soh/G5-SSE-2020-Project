@@ -53,18 +53,6 @@ def create():
 
     if candidate_order != None and candidate_order > count:
         candidate_order = count + 1
-    elif candidate_order != None and candidate_order < count:
-        change_candidate = db.execute(
-            'SELECT * FROM candidate WHERE party_id = ? AND candidate_order = ?',
-            (party_id, candidate_order)
-        ).fetchone()
-
-        change_id = change_candidate['id']
-
-        db.execute(
-            'UPDATE candidate SET candidate_order = ? WHERE id = ?',
-            (count + 1, change_id)
-        )
 
     # Save to DB
     db.execute(
