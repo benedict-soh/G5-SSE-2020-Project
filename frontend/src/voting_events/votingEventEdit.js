@@ -2,15 +2,15 @@ import React, {Component, useState, useEffect} from 'react';
 import NavigationTopBar from '../navigation/NavigationTopBar'
 import {Route, withRouter, Switch, useParams} from "react-router-dom";
 import '../App.css';
-import EventForm from "./voteEventForm"
+import VotingEventForm from "./votingEventForm"
 
-export default function EventEdit(props) {
+export default function VotingEventEdit(props) {
   const id = props.match.params.id;
   const [voteEvent, setVoteEvent] = useState('');
 
   useEffect(() => {
     if(id) {
-      fetch('/voting_events/'+id).then(response =>
+      fetch('/voting-events/'+id).then(response =>
         response.json().then(data => {
           // setEvents(data.events);
           setVoteEvent(data);
@@ -22,6 +22,6 @@ export default function EventEdit(props) {
   }, [])
 
   return (
-    <EventForm voteEvent={voteEvent} event_id={id} />
+    <VotingEventForm voteEvent={voteEvent} event_id={id} />
   )
 }

@@ -3,7 +3,7 @@ import NavigationTopBar from '../navigation/NavigationTopBar'
 import {Route, withRouter, Switch} from "react-router-dom";
 import '../App.css';
 
-const EventForm = ({voteEvent, event_id}) =>{
+const VotingEventForm = ({voteEvent, event_id}) =>{
 	const [event_name, setEventName] = useState("");
 	const [year, setEventYear] = useState("");
 	const [vote_start, setVoteStart] = useState("");
@@ -25,7 +25,7 @@ const EventForm = ({voteEvent, event_id}) =>{
 	const createEvent = async () => {
 		console.log("Create");
 		const newEvent = {event_name, year, vote_start, vote_end};
-		const response = await fetch("/voting_events/create", {
+		const response = await fetch("/voting-events/create", {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json"
@@ -34,7 +34,7 @@ const EventForm = ({voteEvent, event_id}) =>{
 		});
 		if(response.ok) {
 			console.log("Created event");
-			window.location.replace("/event");
+			window.location.replace("/voting_events");
 		} else {
 			console.log("Didnt create event");
 		}
@@ -43,7 +43,7 @@ const EventForm = ({voteEvent, event_id}) =>{
 	const updateEvent = async () => {
 		console.log("Update");
 		const updateEvent = {event_name, year, vote_start, vote_end};
-		const response = await fetch("/voting_events/"+event_id+"/update", {
+		const response = await fetch("/voting-events/"+event_id+"/update", {
 			method: "PUT",
 			headers: {
 				"Content-Type": "application/json"
@@ -52,7 +52,7 @@ const EventForm = ({voteEvent, event_id}) =>{
 		});
 		if(response.status == "204") {
 			console.log("Updated event");
-			window.location.replace("/event");
+			window.location.replace("/voting_events");
 		} else {
 			console.log("Didnt update event");
 		}
@@ -102,4 +102,4 @@ const EventForm = ({voteEvent, event_id}) =>{
 		)
 }
 
-export default EventForm;
+export default VotingEventForm;
