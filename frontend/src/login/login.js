@@ -9,7 +9,7 @@ import Button from "@material-ui/core/Button";
 import Grid from "@material-ui/core/Grid";
 import {authTest_request, login_request} from "../utils/API";
 import {Alert} from '@material-ui/lab';
-import Redirect from "react-router-dom/es/Redirect";
+import { Redirect } from "react-router-dom";
 import {authActions} from "../utils/store";
 import connect from "react-redux/lib/connect/connect";
 

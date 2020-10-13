@@ -4,6 +4,8 @@ import Button from '@material-ui/core/Button';
 import { NavLink } from "react-router-dom";
 import { makeStyles, ThemeProvider } from "@material-ui/core/styles";
 import connect from "react-redux/lib/connect/connect";
+import {logout_request} from "../utils/API";
+import {authActions} from "../utils/store";
 
 const theme = createMuiTheme({
     typography: {
@@ -84,16 +86,39 @@ function NavigationBarOption(props) {
   );
 };
 
-function LoginAvatar(props) {
+function LoginAvatar() {
   const classes = useStyles();
   return (
       <ThemeProvider theme={theme}>
-          <NavLink exact to={props.to} className={classes.leftTab}>
-              <Button className={classes.loginButton}>{props.label}</Button>
+          <NavLink exact to={"/login"} className={classes.leftTab}>
+              <Button className={classes.loginButton}>Log in</Button>
           </NavLink>
       </ThemeProvider>
   );
 };
+
+function LogoutAvatar(props) {
+  const classes = useStyles();
+  return (
+      <ThemeProvider theme={theme}>
+          <div className={classes.leftTab}>
+              <Button className={classes.loginButton} onClick={() => logout(props)}>Log out</Button>
+          </div>
+      </ThemeProvider>
+  );
+};
+
+function logout(props){
+    logout_request()
+        .then(
+        (r) => {
+            if (r === 200){
+                props.logout();
+            }
+        }).catch((err) => {
+            console.log(err);
+    });
+}
 
 function NavigationTopBar(props) {
     const classes = useStyles();
@@ -109,15 +134,19 @@ function NavigationTopBar(props) {
                         <NavigationBarOption label={"For Voters"} to={"/vote"} />
                         <NavigationBarOption label={"For Parties"} to={"/parties"} />
                     </Tabs>
-                    {props.isLoggedIn? <LoginAvatar label={"Logout"} to={"/logout"} /> : <LoginAvatar label={"Login"} to={"/login"} />}
+                    {props.isLoggedIn? <LogoutAvatar logout={props.logout}/> : <LoginAvatar/>}
                 </Toolbar>
             </div>
         </AppBar>
     )
 };
 
+const mapDispatchToProps = (dispatch) => ({
+    logout: () => dispatch(authActions.logout()),
+});
+
 const mapStateToProps = (state) => ({
     isLoggedIn: state.authReducer.isLoggedIn,
 });
 
-export default connect(mapStateToProps)(NavigationTopBar);
+export default connect(mapStateToProps, mapDispatchToProps)(NavigationTopBar);
