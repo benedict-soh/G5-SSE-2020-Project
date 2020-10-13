@@ -3,6 +3,7 @@ import {AppBar, createStyles, fade, Tabs, Theme, Toolbar, createMuiTheme, Tab} f
 import Button from '@material-ui/core/Button';
 import { NavLink } from "react-router-dom";
 import { makeStyles, ThemeProvider } from "@material-ui/core/styles";
+import connect from "react-redux/lib/connect/connect";
 
 const theme = createMuiTheme({
     typography: {
@@ -81,7 +82,7 @@ function NavigationBarOption(props) {
           </NavLink>
       </ThemeProvider>
   );
-}
+};
 
 function LoginAvatar(props) {
   const classes = useStyles();
@@ -92,9 +93,9 @@ function LoginAvatar(props) {
           </NavLink>
       </ThemeProvider>
   );
-}
+};
 
-export default function NavigationTopBar(props) {
+function NavigationTopBar(props) {
     const classes = useStyles();
     return (
         <AppBar position="static" className={classes.root}>
@@ -108,9 +109,15 @@ export default function NavigationTopBar(props) {
                         <NavigationBarOption label={"For Voters"} to={"/vote"} />
                         <NavigationBarOption label={"For Parties"} to={"/parties"} />
                     </Tabs>
-                    <LoginAvatar label={"Login"} to={"/login"} />
+                    {props.isLoggedIn? <LoginAvatar label={"Logout"} to={"/logout"} /> : <LoginAvatar label={"Login"} to={"/login"} />}
                 </Toolbar>
             </div>
         </AppBar>
     )
-}
+};
+
+const mapStateToProps = (state) => ({
+    isLoggedIn: state.authReducer.isLoggedIn,
+});
+
+export default connect(mapStateToProps)(NavigationTopBar);

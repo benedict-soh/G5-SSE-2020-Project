@@ -1,25 +1,30 @@
 import axios from "axios";
-
-const BaseUrl = "http://127.0.0.1:5000"
-const loginAPI = "/auth/login" // POST
-const logoutAPI= "/auth/logout" //[POST, GET]
+import Cookies from 'js-cookie';
+const BaseUrl = "http://127.0.0.1:5000";
+const loginAPI = "/auth/login"; // POST
+const logoutAPI= "/auth/logout"; // [POST, GET]
+const authTestAPI= "/auth/test"; // GET
 
 // post API request for login
 export async function login_request(username, password) {
     const response = await axios.post(
-        BaseUrl + loginAPI,
+        loginAPI,
         {"username" : username, "password" : password},
-        {headers:{"Content-Type": "application/json", "Access-Control-Allow-Origin": "*"}}
-        )
+        {headers:{"Content-Type": "application/json"}}
+        );
+    console.log(response);
     return response.data
 }
 
 // post API request for logout
 export async function logout_request() {
-    const response = await axios.post(
-        BaseUrl + logoutAPI,
-        {},
-        {headers:{"Content-Type": "application/json"}}
-    )
-    return response.data
+    const response = await axios.get(logoutAPI);
+    return response.status
+}
+
+
+// post API request for logout
+export async function authTest_request(token) {
+    const response = await axios.get(authTestAPI);
+    return response.status
 }
