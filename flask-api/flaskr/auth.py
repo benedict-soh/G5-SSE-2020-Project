@@ -60,17 +60,21 @@ def login():
 
     db = get_db()
 
-    user = db.execute(
+    user_cred = db.execute(
         'SELECT * FROM user_cred WHERE username = ?', (username,)
     ).fetchone()
 
-    if user is None:
+    if user_cred is None:
         abort(400, 'The username or password was incorrect')
-    elif not check_password_hash(user['password'], password):
+    elif not check_password_hash(user_cred['password'], password):
         abort(400, 'The username or password was incorrect')
 
-    # do JWT stuff here
-    access_token = create_access_token(identity=username)
+    user = db.execute(
+        'SELECT * FROM user WHERE id = ?', (user_cred['user_id'],)
+    ).fetchone()
+
+    # do JWT stuff here. create_access_token can only contain one variable
+    access_token = create_access_token([user['id'], user['user_type']])
     resp = jsonify({'login': True})
     set_access_cookies(resp, access_token)
     return resp, 200
