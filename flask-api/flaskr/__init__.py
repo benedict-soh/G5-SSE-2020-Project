@@ -26,7 +26,7 @@ def create_app(test_config=None):
     app.config['JWT_SECRET_KEY'] =  os.environ['FLASK_SECRET_KEY']
     app.config['JWT_TOKEN_LOCATION'] = ['cookies']
 
-    # these two should be set to true in the feature. 
+    # these two should be set to true in the future. 
     # The first adds CSRF (more work for testing), the second forces the cookies to be sent over https (which is currently not supported).
     app.config['JWT_COOKIE_CSRF_PROTECT'] = False
     app.config['JWT_COOKIE_SECURE'] = False
