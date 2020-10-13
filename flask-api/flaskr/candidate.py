@@ -14,13 +14,16 @@ def create():
     try:
         candidate_name = request.json['candidate_name']
         v_event_id = request.json['v_event_id']
+        exclude = request.json['exclude']
     except:
         abort(400, 'Bad Request')
 
     try:
         party_id = request.json['party_id']
+        candidate_order = request.json['candidate_order']
     except:
         party_id = None
+        candidate_order = None
 
     db = get_db()
 
@@ -41,10 +44,35 @@ def create():
     if v_event is None:
         abort(400, 'Bad Request')
 
+    # Check member count and order
+    candidates = db.execute(
+        'SELECT * FROM candidate WHERE party_id = ?',
+        (party_id,)
+    ).fetchall()
+    count = len(candidates)
+
+    if candidate_order != None and candidate_order > count:
+        candidate_order = count + 1
+    elif candidate_order != None and candidate_order < count:
+        change_candidate = db.execute(
+            'SELECT * FROM candidate WHERE party_id = ? AND candidate_order = ?',
+            (party_id, candidate_order)
+        ).fetchone()
+
+        change_id = change_candidate['id']
+
+        db.execute(
+            'UPDATE candidate SET candidate_order = ? WHERE id = ?',
+            (count + 1, change_id)
+        )
+
+    # Format exclude boolean
+    exclude = exclude.lower() in ['true', '1']
+
     # Save to DB
     db.execute(
-        'INSERT INTO candidate (candidate_name, party_id, v_event_id) VALUES (?, ?, ?)',
-        (candidate_name, party_id, v_event_id)
+        'INSERT INTO candidate (candidate_name, party_id, v_event_id, candidate_order, exclude) VALUES (?, ?, ?, ?, ?)',
+        (candidate_name, party_id, v_event_id, candidate_order, exclude)
     )
     db.commit()
 
@@ -82,48 +110,40 @@ def getList():
     cursor = db.cursor()
 
     if (candidate_name == None and party_id == None and v_event_id == None):
-        print("1")
         candidates = cursor.execute(
             'SELECT * FROM candidate'
         ).fetchall()
     elif (candidate_name != None and party_id != None and v_event_id != None):
-        print("2")
         candidates = cursor.execute(
             'SELECT * FROM candidate WHERE candidate_name = ? AND party_id = ? AND v_event_id = ?',
             (candidate_name, party_id, v_event_id)
         ).fetchall()
     elif (candidate_name != None and party_id != None and v_event_id == None):
-        print("3")
         candidates = cursor.execute(
             'SELECT * FROM candidate WHERE candidate_name = ? AND party_id = ?',
             (candidate_name, party_id)
         ).fetchall()
     elif (candidate_name != None and party_id == None and v_event_id != None):
-        print("4")
         candidates = cursor.execute(
             'SELECT * FROM candidate WHERE candidate_name = ? AND v_event_id = ?',
             (candidate_name, v_event_id)
         ).fetchall()
     elif (candidate_name == None and party_id != None and v_event_id != None):
-        print("5")
         candidates = cursor.execute(
             'SELECT * FROM candidate WHERE party_id = ? AND v_event_id = ?',
             (party_id, v_event_id)
         ).fetchall()
     elif (candidate_name != None):
-        print("6")
         candidates = cursor.execute(
             'SELECT * FROM candidate WHERE candidate_name = ?',
             (candidate_name,)
         ).fetchall()
     elif (party_id != None):
-        print("7")
         candidates = cursor.execute(
             'SELECT * FROM candidate WHERE party_id = ?',
             (party_id,)
         ).fetchall()
     elif (v_event_id != None):
-        print("8")
         candidates = cursor.execute(
             'SELECT * FROM candidate WHERE v_event_id = ?',
             (v_event_id,)
@@ -150,13 +170,16 @@ def update(candidate_id):
     try:
         candidate_name = request.json['candidate_name']
         v_event_id = request.json['v_event_id']
+        exclude = request.json['exclude']
     except:
         abort(400, 'Bad Request')
 
     try:
         party_id = request.json['party_id']
+        candidate_order = request.json['candidate_order']
     except:
         party_id = None
+        candidate_order = None
 
     db = get_db()
 
@@ -177,10 +200,35 @@ def update(candidate_id):
     if v_event is None:
         abort(400, 'Bad Request')
 
+    # Check member count and order
+    candidates = db.execute(
+        'SELECT * FROM candidate WHERE party_id = ?',
+        (party_id,)
+    ).fetchall()
+    count = len(candidates)
+
+    if candidate_order != None and candidate_order > count:
+        candidate_order = count + 1
+    elif candidate_order != None and candidate_order < count:
+        change_candidate = db.execute(
+            'SELECT * FROM candidate WHERE party_id = ? AND candidate_order = ?',
+            (party_id, candidate_order)
+        ).fetchone()
+
+        change_id = change_candidate['id']
+
+        db.execute(
+            'UPDATE candidate SET candidate_order = ? WHERE id = ?',
+            (count + 1, change_id)
+        )
+
+    # Format exclude boolean
+    exclude = exclude.lower() in ['true', '1']
+
     # Update DB
     db.execute(
-        'UPDATE candidate SET candidate_name = ?, party_id = ?, v_event_id = ? WHERE id = ?',
-        (candidate_name, party_id, v_event_id, candidate_id)
+        'UPDATE candidate SET candidate_name = ?, party_id = ?, v_event_id = ?, candidate_order = ?, exclude = ? WHERE id = ?',
+        (candidate_name, party_id, v_event_id, candidate_order, exclude, candidate_id)
     )
     db.commit()
 
