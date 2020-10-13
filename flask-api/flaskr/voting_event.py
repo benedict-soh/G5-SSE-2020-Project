@@ -4,7 +4,7 @@ from flask_jwt_extended import jwt_required
 from datetime import datetime
 import json
 
-bp = Blueprint('voting_events', __name__, url_prefix='/voting_events')
+bp = Blueprint('voting_events', __name__, url_prefix='/voting-events')
 
 @bp.route('/create', methods=['POST'])
 @jwt_required
