@@ -64,8 +64,8 @@ Requires a JSON object with the following fields:
 {
     "event_name" : "a string",
     "year" : "a year, e.g. 2020",
-    "vote_start" : "a date in the format of 'YY-MM-DD'",
-    "vote_end" : "a date in the format of 'YY-MM-DD'"
+    "vote_start" : "a date in the format of 'YYYY-MM-DD'",
+    "vote_end" : "a date in the format of 'YYYY-MM-DD'"
 }
 ```
 
@@ -83,8 +83,8 @@ Returns 200 with a JSON object with the following fields:
     "id" : "an integer",
     "event_name" : "a string",
     "year" : "a year, e.g. 2020",
-    "vote_start" : "a date in the format of 'YY-MM-DD HH:MM:SS'",
-    "vote_end" : "a date in the format of 'YY-MM-DD HH:MM:SS'"
+    "vote_start" : "a date in the format of 'YYYY-MM-DD HH:MM:SS'",
+    "vote_end" : "a date in the format of 'YYYY-MM-DD HH:MM:SS'"
 }
 ```
 
@@ -99,23 +99,23 @@ Returns 200 with a **list** of JSON objects such as:
       "id" : "an integer",
       "event_name" : "a string",
       "year" : "a year, e.g. 2020",
-      "vote_start" : "a date in the format of 'YY-MM-DD HH:MM:SS'",
-      "vote_end" : "a date in the format of 'YY-MM-DD HH:MM:SS'"
+      "vote_start" : "a date in the format of 'YYYY-MM-DD HH:MM:SS'",
+      "vote_end" : "a date in the format of 'YYYY-MM-DD HH:MM:SS'"
   }
 ]
 ```
 
 ### Update
 
-`/voting-events/{voting-event-ID}/create` methods=['PUT']
+`/voting-events/{voting-event-ID}/update` methods=['PUT']
 
 Requires a JSON object with the following fields:
 ```json
 {
     "event_name" : "a string",
     "year" : "a year, e.g. 2020",
-    "vote_start" : "a date in the format of 'YY-MM-DD'",
-    "vote_end" : "a date in the format of 'YY-MM-DD'"
+    "vote_start" : "a date in the format of 'YYYY-MM-DD'",
+    "vote_end" : "a date in the format of 'YYYY-MM-DD'"
 }
 ```
 
@@ -124,5 +124,168 @@ Returns 204 upon success.
 ### Delete
 
 `/voting-events/{voting-event-ID}/delete` methods=['DELETE']
+
+Returns 204 upon success.
+
+## Party Endpoints:
+
+### Create
+
+`/parties/create` methods=['POST']
+
+Requires a JSON object with the following fields:
+```json
+{
+    "party_name" : "a string",
+    "v_event_id" : "a Voting Event ID (Integer)"
+}
+```
+
+Returns 204 upon success.
+
+### Get by ID
+
+`/parties/{party-ID}` methods=['GET']
+
+Returns 200 with a JSON object with the following fields:
+```json
+{
+    "id": "an integer",
+    "party_name": "a string",
+    "v_event_id": "an integer"
+}
+```
+
+### Get All
+
+`/parties` methods=['GET']
+
+Optional parameters can be provided:
+- `party_name` : A String
+- `v_event_id` : An integer
+
+Example: `localhost:5000/parties?party_name=CCP&v_event_id=3`
+
+Returns 200 with a **list** of JSON objects such as:
+```json
+[
+  {
+      "id": "an integer",
+      "party_name": "a string",
+      "v_event_id": "an integer"
+  }
+]
+```
+
+### Update
+
+`/parties/{party-ID}/update` methods=['PUT']
+
+Requires a JSON object with the following fields:
+```json
+{
+    "party_name" : "a string",
+    "v_event_id" : "a Voting Event ID (Integer)"
+}
+```
+
+Returns 204 upon success.
+
+### Delete
+
+`/parties/{party-ID}/delete` methods=['DELETE']
+
+Returns 204 upon success.
+
+## Candidate Endpoints:
+
+### Create
+
+`/candidates/create` methods=['POST']
+
+Requires a JSON object with the following fields:
+```json
+{
+    "candidate_name": "a string",
+    "v_event_id": "an integer"
+}
+```
+
+An optional field of `party_id` can be provided if the candidate belongs to a party:
+
+```json
+{
+    "candidate_name": "a string",
+    "v_event_id": "an integer",
+    "party_id": "an integer"
+}
+```
+
+Returns 204 upon success.
+
+### Get by ID
+
+`/candidates/{candidate-ID}` methods=['GET']
+
+Returns 200 with a JSON object with the following fields:
+```json
+{
+    "id": "an integer",
+    "candidate_name": "a string",
+    "party_id": "an integer OR null",
+    "v_event_id": "an integer"
+}
+```
+
+### Get All
+
+`/candidates` methods=['GET']
+
+Optional parameters can be provided:
+- `candidate_name` : A String
+- `v_event_id` : An integer
+- `party_id` : An integer
+
+Example: `localhost:5000/candidates?party_id=1`
+
+Returns 200 with a **list** of JSON objects such as:
+```json
+[
+  {
+      "id": "an integer",
+      "candidate_name": "a string",
+      "party_id": "an integer OR null",
+      "v_event_id": "an integer"
+  }
+]
+```
+
+### Update
+
+`/candidates/{candidate-ID}/update` methods=['PUT']
+
+Requires a JSON object with the following fields:
+```json
+{
+    "candidate_name": "a string",
+    "v_event_id": "an integer"
+}
+```
+
+An optional field of `party_id` can be provided if the candidate belongs to a party:
+
+```json
+{
+    "candidate_name": "a string",
+    "v_event_id": "an integer",
+    "party_id": "an integer"
+}
+```
+
+Returns 204 upon success.
+
+### Delete
+
+`/candidates/{candidate-ID}/delete` methods=['DELETE']
 
 Returns 204 upon success.

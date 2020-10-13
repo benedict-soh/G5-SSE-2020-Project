@@ -1,9 +1,10 @@
 import os
 from flask import Flask
 from . import (
-    test_page, auth, voting_event
+    test_page, auth, candidate, party, voting_event
 )
 from flask_jwt_extended import JWTManager
+from flask_cors import CORS
 
 
 
@@ -12,6 +13,9 @@ def create_app(test_config=None):
 
     # create the application
     app = Flask(__name__, instance_relative_config=True)
+
+    # Allow all CORS requests, since this is an API only
+    CORS(app)
 
     # add more configs here
     app.config.from_mapping(
@@ -28,6 +32,8 @@ def create_app(test_config=None):
     app.register_blueprint(test_page.simple_page)
     app.register_blueprint(auth.bp)
     app.register_blueprint(voting_event.bp)
+    app.register_blueprint(candidate.bp)
+    app.register_blueprint(party.bp)
 
 
     # setting up JWT manager
