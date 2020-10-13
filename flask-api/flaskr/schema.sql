@@ -60,6 +60,8 @@ CREATE TABLE candidate (
     candidate_name text NOT NULL,
     party_id INTEGER,
     v_event_id INTEGER NOT NULL,
+    candidate_order INTEGER,
+    exclude BOOLEAN NOT NULL DEFAULT FALSE,
     FOREIGN KEY(party_id) REFERENCES party(id),
     FOREIGN KEY(v_event_id) REFERENCES voting_event(id)
 );
