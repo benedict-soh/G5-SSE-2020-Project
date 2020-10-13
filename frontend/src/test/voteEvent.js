@@ -8,17 +8,17 @@ const EventList = () =>{
 	const [events, setEvents] = useState([]);
 
   useEffect(() => {
-    fetch('/voting-events').then(response =>
+    fetch('/voting_events').then(response =>
       response.json().then(data => {
-        setEvents(data);
+        // setEvents(data.events);
+				setEvents(data);
       })
     );
   }, [])
 
-  console.log(events);
-
 	return(
 			<div>
+			<h2>Voting Event Read Page</h2>
       <Events events={events} />
       </div>
 		);
