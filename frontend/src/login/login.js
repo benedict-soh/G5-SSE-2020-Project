@@ -169,6 +169,7 @@ export const useStyles = makeStyles((theme) =>
 );
 
 
+
 function LoginForm(props) {
 
     const classes = useStyles();
@@ -191,10 +192,12 @@ function LoginForm(props) {
         }
     }
 
+
     // empty the password field if there is an error
     useEffect(() => {
         setPassword("");
     },[props.isError]);
+
 
     return (
         <div className={classes.userForm}>
@@ -202,6 +205,7 @@ function LoginForm(props) {
                 <ThemeProvider theme={theme}>
                     < TextField
                         value={username}
+
                         variant="outlined"
                         margin="normal"
                         required
