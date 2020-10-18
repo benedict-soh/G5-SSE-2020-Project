@@ -53,6 +53,40 @@ Will strip away both of the provided Cookies.
 
 Will require a valid JWT Cookie and the CSRF header (See login for CSRF example).
 
+## Voting Endpoints:
+
+### Create
+
+`/votes/create` methods=['POST']
+
+Requires a JSON object with the following fields:
+```json
+{
+    "v_event_id": "a number",
+    "above": [
+      {
+        "party_id": "a number",
+        "number": "a number"
+      }
+    ],
+    "below": [
+      {
+        "candidate_id": "a number",
+        "number": "a number"
+      }
+    ]
+}
+```
+
+The `above` **OR** `below` fields _must_ be filled.
+If the `above` field is filled, it **must contain 6 objects**.
+If the `below` field is filled, it **must contain 12 objects**.
+`v_event_id` must be a valid event ID.
+
+Returns 204 upon success.
+
+If the date format needs to be changed, ping me (Ben) on Discord.
+
 ## Voting Event Endpoints:
 
 ### Create
