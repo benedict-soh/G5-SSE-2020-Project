@@ -207,17 +207,20 @@ Requires a JSON object with the following fields:
 ```json
 {
     "candidate_name": "a string",
-    "v_event_id": "an integer"
+    "v_event_id": "an integer",
+    "exclude": "boolean value"
 }
 ```
 
-An optional field of `party_id` can be provided if the candidate belongs to a party:
+Optional fields of `party_id` and `candidate_order` can be provided if the candidate belongs to a party:
 
 ```json
 {
     "candidate_name": "a string",
     "v_event_id": "an integer",
-    "party_id": "an integer"
+    "party_id": "an integer",
+    "exclude": "boolean value",
+    "candidate_order": "an integer - must be a value from 1 to the total amount of party members"
 }
 ```
 
@@ -268,17 +271,20 @@ Requires a JSON object with the following fields:
 ```json
 {
     "candidate_name": "a string",
-    "v_event_id": "an integer"
+    "v_event_id": "an integer",
+    "exclude": "boolean value"
 }
 ```
 
-An optional field of `party_id` can be provided if the candidate belongs to a party:
+Optional fields of `party_id` and `candidate_order` can be provided if the candidate belongs to a party:
 
 ```json
 {
     "candidate_name": "a string",
     "v_event_id": "an integer",
-    "party_id": "an integer"
+    "party_id": "an integer",
+    "exclude": "boolean value",
+    "candidate_order": "an integer - must be a value from 1 to the total amount of party members"
 }
 ```
 
