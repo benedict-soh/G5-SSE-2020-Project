@@ -145,37 +145,76 @@ Returns 200 with a **list** of JSON objects such as:
 
 Returns 200 with a JSON object:
 ```json
-[
-  {
-      "above": [
-        {
-          "party_id": "a number",
-          "votes": [
-            {"a number in 1..{No. of Parties}": "a number"},
-            {"a number in 1..{No. of Parties}": "a number"},
-            ...
-          ]
-        },
-        ...
-      ],
-      "below": [
-        {
-          "candidate_id": "a number",
-          "votes": [
-            {"a number in 1..{No. of Candidates}": "a number"},
-            {"a number in 1..{No. of Candidates}": "a number"},
-            ...
-          ]
-        },
-        ...
-      ],
-      "total_above": "a number",
-      "total_below": "a number",
-      "total": "a number"
-  }
-]
+{
+    "above": [
+      {
+        "party_id": "a number",
+        "votes": [
+          {"a number in 1..{No. of Parties}": "a number"},
+          {"a number in 1..{No. of Parties}": "a number"},
+          ...
+        ]
+      },
+      ...
+    ],
+    "below": [
+      {
+        "candidate_id": "a number",
+        "votes": [
+          {"a number in 1..{No. of Candidates}": "a number"},
+          {"a number in 1..{No. of Candidates}": "a number"},
+          ...
+        ]
+      },
+      ...
+    ],
+    "total_above": "a number",
+    "total_below": "a number",
+    "total": "a number"
+}
 ```
 `total` is the sum of `total_above` and `total_below`.
+
+Example Response:
+```json
+{
+    "above": [
+      {
+        "party_id": 1,
+        "votes": [
+          {"1": 2},
+          {"2": 0}
+        ]
+      },
+      {
+        "party_id": 2,
+        "votes": [
+          {"1": 0},
+          {"2": 2}
+        ]
+      }
+    ],
+    "below": [
+      {
+        "candidate_id": 1,
+        "votes": [
+          {"1": 0},
+          {"2": 1}
+        ]
+      },
+      {
+        "candidate_id": 2,
+        "votes": [
+          {"1": 1},
+          {"2": 0}
+        ]
+      }
+    ],
+    "total_above": 2,
+    "total_below": 1,
+    "total": 3
+}
+```
 
 ### Update
 
