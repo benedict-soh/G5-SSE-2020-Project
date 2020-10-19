@@ -46,6 +46,13 @@ Will also return a non-HttpOnly Cookie named `csrf_access_token`, and the fronte
 
 Will strip away both of the provided Cookies.
 
+#### Get role
+
+`/auth/get-role` methods=['GET']
+
+Given a user has a valid JWT token, return the user's role as a string the body.
+
+This is intended for authorisation checks on statically rendered page.
 
 #### Test endpoint (will be around until we implement some real endpoints)
 

@@ -87,6 +87,13 @@ def logout():
     return resp, 200
 
 
+@bp.route('/get-role', methods = ['GET'])
+@jwt_required
+def get_role():
+    claims = get_jwt_claims()
+    return claims['user_type']
+
+
 @bp.route('/test', methods=['POST', 'GET'])
 @jwt_required
 def test():
