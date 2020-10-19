@@ -1,4 +1,4 @@
-import React, {Component, useState} from "react";
+import React, {Component, useEffect, useState} from "react";
 import {theme} from "../utils/constants";
 import TextField from "@material-ui/core/TextField";
 import {ThemeProvider} from "@material-ui/core/styles";
@@ -7,57 +7,69 @@ import makeStyles from "@material-ui/core/styles/makeStyles";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import Button from "@material-ui/core/Button";
 import Grid from "@material-ui/core/Grid";
-import {login_request} from "../utils/API";
-import { Alert } from '@material-ui/lab';
+import {authTest_request, login_request} from "../utils/API";
+import {Alert} from '@material-ui/lab';
+import { Redirect } from "react-router-dom";
+import {authActions} from "../utils/store";
+import connect from "react-redux/lib/connect/connect";
 
-export default class loginPage extends Component {
+class loginPage extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            isPageLoading: true,
             isLoading: false,
-            isLoggedIn: false,
             error: "",
-        }
+        };
         this.login = this.login.bind(this);
     }
-
-    // when we load this page, first check if already logged in
     componentWillMount() {
-        if (this.check_auth() === true){
-            this.setState({isLoggedIn: true})
-        }
+        this.checkAuth();
     }
 
     // the main login function that handles responses
-    login(username, password){
-        this.setState({isLoading: true});
+    login(username, password) {
+        this.setState({isLoading: true, error: ""});
         login_request(username, password)
             .then(r => {
                 console.log(r);
-                this.setState({isLoading: false, isLoggedIn: true});
+                this.props.login();
             }).catch((err) => {
-                    const error = JSON.stringify(err)
-                    console.log(err.message);
-                    this.setState({isLoading: false, error: err.message});
-            })
-    }
-    componentDidUpdate(prevProps, prevState, snapshot) {
+            this.setState({isLoading: false, error: err.message});
+        })
     }
 
-    //check authentication
-    check_auth() {
-        console.log("checking")
-        return true
+    checkAuth(){
+        authTest_request()
+            .then(
+                (r) => {
+                    if (r === 200){
+                        this.props.login();
+                    }
+                }).catch((err) => {
+                    console.log(err)
+                    this.props.logout();
+                    this.setState({isPageLoading: false})
+                });
     }
 
     render() {
+        if (this.state.isPageLoading) {
+            return null;
+        }
         return (
-            <Grid container style={loginStyles.whiteBackground} >
-                <Grid item xs={12}>
-                    {this.state.error && <Alert severity="error">{this.state.error}</Alert>}
-                    <LoginForm isLoading={this.state.isLoading} login={this.login}/>
+            <>
+                {this.props.isLoggedIn? <Redirect push to="/vote" /> :
+                <Grid container style={loginStyles.whiteBackground}>
+                    <Grid item xs={12}>
+                        {this.state.error && <Alert severity="error">{this.state.error}</Alert>}
+                        <LoginForm isLoading={this.state.isLoading} isError={this.state.error} login={this.login}/>
+                    </Grid>
                 </Grid>
-            </Grid>);
+                }
+            </>
+
+        );
 
     }
 }
@@ -161,13 +173,13 @@ export const useStyles = makeStyles((theme) =>
 function LoginForm(props) {
 
     const classes = useStyles();
-    const [username, setUsername] = useState();
-    const [password, setPassword] = useState();
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
 
     function handleSubmit(event) {
         event.preventDefault();
         if (username && password) {
-            props.login(username, password)
+            props.login(username, password);
         }
     }
 
@@ -180,11 +192,20 @@ function LoginForm(props) {
         }
     }
 
+
+    // empty the password field if there is an error
+    useEffect(() => {
+        setPassword("");
+    },[props.isError]);
+
+
     return (
         <div className={classes.userForm}>
             <form onSubmit={handleSubmit}>
                 <ThemeProvider theme={theme}>
                     < TextField
+                        value={username}
+
                         variant="outlined"
                         margin="normal"
                         required
@@ -192,10 +213,12 @@ function LoginForm(props) {
                         id="username"
                         label="Username"
                         name="username"
+                        autoComplete="username"
                         autoFocus
                         onChange={handleChange}
                     />
                     < TextField
+                        value={password}
                         variant="outlined"
                         margin="normal"
                         required
@@ -217,3 +240,14 @@ function LoginForm(props) {
         </div>
     );
 }
+
+const mapDispatchToProps = (dispatch) => ({
+    logout: () => dispatch(authActions.logout()),
+    login: () => dispatch(authActions.login()),
+});
+
+const mapStateToProps = (state) => ({
+    isLoggedIn: state.authReducer.isLoggedIn,
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(loginPage)
