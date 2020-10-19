@@ -76,6 +76,90 @@ def getList():
     resp.headers['Content-Type'] = 'application/json'
     return resp
 
+@bp.route('/<int:voting_event_id>/tally', methods=['GET'])
+@jwt_required
+def tally(voting_event_id):
+    db = get_db()
+    cursor = db.cursor()
+    votes = cursor.execute(
+        'SELECT * FROM vote_data WHERE v_event_id = ?', (voting_event_id,)
+    ).fetchall()
+
+    # Check if there are votes
+    if len(votes) == 0:
+        abort(404, 'Not Found')
+
+    # Grab parties and candidates
+    cursor = db.cursor()
+    parties = cursor.execute(
+        'SELECT * FROM party WHERE v_event_id = ?',
+        (voting_event_id,)
+    ).fetchall()
+    party_id_list = list(map(lambda party: party['id'], parties))
+
+    cursor = db.cursor()
+    candidates = cursor.execute(
+        'SELECT * FROM candidate WHERE v_event_id = ?',
+        (voting_event_id,)
+    ).fetchall()
+    candidates_id_list = list(map(lambda candidate: candidate['id'], candidates))
+
+    # Serialise data into a list of JSON object
+    vote_data = list(map(lambda vote: json.loads(vote['vote_data_blob']), votes))
+
+    # Construct voting objects
+    above_votes = []
+    for party in parties:
+        temp = []
+        for num in range(1, len(parties) + 1):
+            obj = {}
+            obj[num] = 0
+            temp.append(obj)
+
+        above_votes.append({"party_id": party['id'], "votes": temp})
+
+    below_votes = []
+    for candidate in candidates:
+        temp = []
+        for num in range(1, len(candidates) + 1):
+            obj = {}
+            obj[num] = 0
+            temp.append(obj)
+
+        below_votes.append({"candidate_id": candidate['id'], "votes": temp})
+
+    # Count votes
+    total_above = 0
+    total_below = 0
+    total = 0
+
+    for vote in vote_data:
+        total += 1
+        atl_vote = vote['above']
+        btl_vote = vote['below']
+
+        if len(atl_vote) >= 6:
+            total_above += 1
+            for mark in atl_vote:
+                for above in above_votes:
+                    if above["party_id"] == mark["party_id"]:
+                        for count in above["votes"]:
+                            if mark["number"] in count:
+                                count[mark["number"]] += 1
+        elif len(btl_vote) >= 12:
+            total_below += 1
+            for mark in btl_vote:
+                for below in below_votes:
+                    if below["candidate_id"] == mark["candidate_id"]:
+                        for count in below["votes"]:
+                            if mark["number"] in count:
+                                count[mark["number"]] += 1
+
+    data = {"above": above_votes, "below": below_votes, "total_above": total_above, "total_below": total_below,"total": total}
+    resp = make_response(json.dumps(data, default=str), 200)
+    resp.headers['Content-Type'] = 'application/json'
+    return resp
+
 @bp.route('/<int:voting_event_id>/update', methods=['PUT'])
 @jwt_required
 def update(voting_event_id):

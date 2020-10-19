@@ -5,11 +5,6 @@ import json
 
 bp = Blueprint('votes', __name__, url_prefix='/votes')
 
-# {
-#   v_event_id
-#   above = [ {party_id, number} ],
-#   below = [ {candidate_id, number} ]
-# }
 @bp.route('/create', methods=['POST'])
 @jwt_required
 def create():
@@ -80,10 +75,14 @@ def create():
                     abort(400, 'Bad Request')
 
             # Check for no duplicate values
-            initial_length = len(atl_vote)
+            length = len(atl_vote)
             vote_values = list(map(lambda vote: vote['number'], atl_vote))
             vote_values = list(dict.fromkeys(vote_values))
-            if initial_length != len(vote_values):
+            if length != len(vote_values):
+                abort(400, 'Bad Request')
+
+            # Check if numbered correctly
+            if set(vote_values) != set(range(1, length + 1)):
                 abort(400, 'Bad Request')
 
         elif len(btl_vote) >= 12:
@@ -94,15 +93,21 @@ def create():
                     abort(400, 'Bad Request')
 
             # Check if no duplicate values
-            initial_length = len(btl_vote)
+            length = len(btl_vote)
             vote_values = list(map(lambda vote: vote['number'], btl_vote))
             vote_values = list(dict.fromkeys(vote_values))
-            if initial_length != len(vote_values):
+            if length != len(vote_values):
+                abort(400, 'Bad Request')
+
+            # Check if numbered correctly
+            if set(vote_values) != set(range(1, length + 1)):
                 abort(400, 'Bad Request')
 
         else:
+            # ATL or BTL vote hasn't been done
             abort(400, 'Bad Request')
     except:
+        # Throw error by default
         abort(400, 'Bad Request')
 
     # Create vote_data
