@@ -1,7 +1,7 @@
 import os
 from flask import Flask
 from . import (
-    test_page, auth, candidate, party, voting_event
+    test_page, auth, candidate, party, voting_event, vote
 )
 from flask_jwt_extended import JWTManager
 from flask_cors import CORS
@@ -26,7 +26,7 @@ def create_app(test_config=None):
     app.config['JWT_SECRET_KEY'] =  os.environ['FLASK_SECRET_KEY']
     app.config['JWT_TOKEN_LOCATION'] = ['cookies']
 
-    # these two should be set to true in the future. 
+    # these two should be set to true in the future.
     # The first adds CSRF (more work for testing), the second forces the cookies to be sent over https (which is currently not supported).
     app.config['JWT_COOKIE_CSRF_PROTECT'] = False
     app.config['JWT_COOKIE_SECURE'] = False
@@ -37,7 +37,7 @@ def create_app(test_config=None):
     app.register_blueprint(voting_event.bp)
     app.register_blueprint(candidate.bp)
     app.register_blueprint(party.bp)
-
+    app.register_blueprint(vote.bp)
 
     # setting up JWT manager
     jwt = JWTManager(app)
@@ -52,7 +52,7 @@ def create_app(test_config=None):
             'id': user_id_and_type[0],
             'user_type': user_id_and_type[1]
         }
-    
+
 
     if test_config is None:
         # load the instance config, if it exists, when not testing

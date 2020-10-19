@@ -192,9 +192,6 @@ def update(candidate_id):
     if v_event is None:
         abort(400, 'Bad Request')
 
-    if candidate_order != None and candidate_order > count:
-        abort(400, 'Bad Request: Invalid number') # IDK if there's a better message, but this is here just for debugging purposes if someone spaghets
-
     # Update DB
     db.execute(
         'UPDATE candidate SET candidate_name = ?, party_id = ?, v_event_id = ?, candidate_order = ?, exclude = ? WHERE id = ?',
