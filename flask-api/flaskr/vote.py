@@ -21,8 +21,6 @@ def create():
     token = get_jwt_claims()
     user_id = token['id']
 
-    print("BREAK POINT")
-
     db = get_db()
 
     # Validate v_event_id
@@ -59,8 +57,6 @@ def create():
         (v_event_id,)
     ).fetchall()
     candidates_id_list = list(map(lambda candidate: candidate['id'], candidates))
-
-    print("TESTING POINT")
 
     try:
         atl_vote = vote_data['above']
