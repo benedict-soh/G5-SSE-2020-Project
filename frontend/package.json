@@ -5,6 +5,7 @@
   "proxy": "http://localhost:5000",
   "dependencies": {
     "@material-ui/core": "^4.11.0",
+    "@material-ui/data-grid": "^4.0.0-alpha.7",
     "@material-ui/lab": "^4.0.0-alpha.56",
     "axios": "^0.20.0",
     "cra-template": "1.0.3",
@@ -25,7 +26,6 @@
   "eslintConfig": {
     "extends": "react-app"
   },
-  "proxy": "http://localhost:5000",
   "secure": false,
   "browserslist": {
     "production": [

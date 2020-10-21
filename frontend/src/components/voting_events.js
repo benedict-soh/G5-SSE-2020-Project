@@ -1,5 +1,6 @@
 import React from 'react';
 import {Link} from "react-router-dom";
+import { FormControl } from '@material-ui/core';
 
 export const VotingEvent = ({ voting_events }) => {
   var date;
