@@ -2,7 +2,7 @@ import React, {Component, useEffect, useState} from 'react';
 import NavigationTopBar from '../navigation/NavigationTopBar'
 import {Route, withRouter, Switch, Link} from "react-router-dom";
 import { withStyles, makeStyles } from '@material-ui/core/styles';
-import PartyRows from '../components/party_rows'
+import CandidateRows from '../components/candidate_rows'
 import Button from '@material-ui/core/Button';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -29,37 +29,39 @@ const useStyles = makeStyles({
   },
 });
 
-export default function PartyList() {
-	const [parties, setParties] = useState([]);
+export default function CandidateList() {
+	const [candidates, setCandidates] = useState([]);
   const classes = useStyles();
 
   useEffect(() => {
-    fetch('/parties').then(response =>
+    fetch('/candidates').then(response =>
       response.json().then(data => {
-				setParties(data);
+				setCandidates(data);
       })
     );
   }, [])
 
 	return(
 			<div style={{ height: 300, width: '100%' }}>
-        <Link to={"/parties/create/"}>
+        <Link to={"/candidates/create/"}>
           <Button variant="contained" color="primary">
-            Create New Party
+            Create New Candidate
           </Button>
         </Link>
         <TableContainer component={Paper}>
         <Table className={classes.table} aria-label="customized table">
           <TableHead>
             <TableRow>
-              <StyledTableCell>Party Name</StyledTableCell>
+              <StyledTableCell>Candidate Name</StyledTableCell>
+              <StyledTableCell>Candidate Party</StyledTableCell>
               <StyledTableCell align="center">Voting Event</StyledTableCell>
-              <StyledTableCell align="right">View Party</StyledTableCell>
-              <StyledTableCell align="right">Edit Party</StyledTableCell>
-              <StyledTableCell align="right">Delete Party</StyledTableCell>
+              <StyledTableCell align="right">Excluded</StyledTableCell>
+              <StyledTableCell align="right">View Candidate</StyledTableCell>
+              <StyledTableCell align="right">Edit Candidate</StyledTableCell>
+              <StyledTableCell align="right">Delete Candidate</StyledTableCell>
             </TableRow>
           </TableHead>
-          <PartyRows parties={parties} />
+          <CandidateRows candidates={candidates} />
         </Table>
       </TableContainer>
     </div>

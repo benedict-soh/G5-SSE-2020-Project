@@ -11,6 +11,10 @@ import PartyForm from "./parties/partyForm"
 import PartyList from "./parties/partyList"
 import PartyEdit from "./parties/partyEdit"
 import PartyShow from "./parties/partyShow"
+import CandidateForm from "./candidates/candidateForm"
+import CandidateList from "./candidates/candidateList"
+import CandidateEdit from "./candidates/candidateEdit"
+import CandidateShow from "./candidates/candidateShow"
 import loginPage from "./login/login";
 import {authTest_request} from "./utils/API";
 import connect from "react-redux/lib/connect/connect";
@@ -60,6 +64,10 @@ class App extends Component {
                         <Route path="/parties/update/:id" component={PartyEdit}/>
                         <Route path="/parties/:id" component={PartyShow}/>
                         <Route exact path="/parties" component={PartyList}/>
+                        <Route path="/candidates/create" component={CandidateForm}/>
+                        <Route path="/candidates/update/:id" component={CandidateEdit}/>
+                        <Route path="/candidates/:id" component={CandidateShow}/>
+                        <Route exact path="/candidates" component={CandidateList}/>
                         <Route strict path="/login" component={loginPage}/>
                     </Switch>
                     <a

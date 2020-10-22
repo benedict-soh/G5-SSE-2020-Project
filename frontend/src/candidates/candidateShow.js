@@ -19,10 +19,12 @@ const useStyles = makeStyles((theme) => ({
 
 const excludeArr = {0: "Included", 1: "Excluded"};
 
-export default function PartyShow(props) {
+export default function CandidateShow(props) {
   const id = props.match.params.id;
 	const classes = useStyles();
-  const [candidates, setCandidates] = useState([]);
+  const [candidate_name, setCandidateName] = useState("");
+  const [exclude, setExclude] = useState("");
+  const [candidate_order, setCandidateOrder] = useState("");
   const [party_name, setPartyName] = useState("");
 	const [v_event_id, setEventID] = useState("");
   const [event_name, setEventName] = useState("");
@@ -32,15 +34,17 @@ export default function PartyShow(props) {
 
   useEffect(() => {
     if(id) {
-      fetch('/parties/'+id).then(responseParty =>
-        responseParty.json().then(dataParty => {
-          setPartyName(dataParty.party_name);
-          setEventID(dataParty.v_event_id);
-          return fetch('/voting-events/'+dataParty.v_event_id);
+      var party_id;
+      fetch('/candidates/'+id).then(response =>
+        response.json().then(data => {
+          setCandidateName(data.candidate_name);
+          setExclude(excludeArr[data.exclude]);
+          setCandidateOrder(data.candidate_order);
+          party_id = data.party_id;
+          return fetch('/voting-events/'+data.v_event_id);
         }).then(function(response) {
           return response.json();
         }).then(function(data) {
-          console.log(data);
           var date = new Date(data.vote_start);
           var day = ('0' + date.getDate()).slice(-2);
           var mon = ('0' + (date.getMonth() + 1)).slice(-2);
@@ -55,17 +59,11 @@ export default function PartyShow(props) {
           setEventYear(data.year);
           setVoteStart(vstart);
           setVoteEnd(vend);
-        })
-      );
-    }
-  }, [])
-
-  useEffect(() => {
-    if(id) {
-      fetch('/candidates?party_id='+id).then(response =>
-        response.json().then(data => {
-          setCandidates(data);
-          console.log(data);
+          return fetch('/parties/'+party_id);
+        }).then(function(response) {
+          return response.json();
+        }).then(function(data) {
+          setPartyName(data.party_name);
         })
       );
     }
@@ -74,19 +72,17 @@ export default function PartyShow(props) {
 	return(
 		<div>
     <h1>ID: {id}</h1>
-		<h1>{party_name}</h1>
+		<h1>{candidate_name}</h1>
+    <h2>{exclude}</h2>
+    <h3><u>Associated Party Information</u></h3>
+    <h3>Party Name: {party_name}</h3>
+    <h3>Candidate Order: {candidate_order}</h3>
     <h3><u>Associated Voting Event Information</u></h3>
     <h3>Event Name: {event_name}</h3>
     <h3>Year: {year}</h3>
     <h3>Vote Start Date: {vote_start}</h3>
     <h3>Vote Start End: {vote_end}</h3>
-    <h3><u>Associated Candidates</u></h3>
-    {candidates.map((row) => {
-      return (
-        <h3>[{excludeArr[row.exclude]}] {row.candidate_name} (Ballot Order: {row.candidate_order})</h3>
-      )
-    })}
-    <Link to={"/parties/update/"+id}>
+    <Link to={"/candidates/update/"+id}>
       <Button variant="contained" color="primary">
         Edit
       </Button>
@@ -94,21 +90,21 @@ export default function PartyShow(props) {
     <Button variant="contained"
       color="secondary"
       onClick={async() => {
-        const response = await fetch("/parties/"+id+"/delete", {
+        const response = await fetch("/candidates/"+id+"/delete", {
           method: "DELETE"
         });
         if(response.ok) {
-          console.log("Deleted party");
-          window.location.replace("/parties");
+          console.log("Deleted candidate");
+          window.location.replace("/candidates");
         } else {
-          console.log("Didnt delete party");
+          console.log("Didnt delete candidate");
         }
       }}>
         Delete
     </Button>
-    <Link to={"/parties/"}>
+    <Link to={"/candidates/"}>
       <Button variant="contained">
-        Back to Parties
+        Back to Candidates
       </Button>
     </Link>
 		</div>

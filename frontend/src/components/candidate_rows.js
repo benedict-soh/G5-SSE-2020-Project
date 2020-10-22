@@ -32,8 +32,11 @@ const useStyles = makeStyles({
   },
 });
 
-export default function PartyRows({parties }){
+const excludeArr = {0: "Included", 1: "Excluded"};
+
+export default function CandidateRows({candidates }){
   const [voting_events, setVotingEvents] = useState([]);
+  const [parties, setParties] = useState([]);
 
   useEffect(() => {
     fetch('/voting-events').then(response =>
@@ -47,24 +50,39 @@ export default function PartyRows({parties }){
     );
   }, [])
 
+  useEffect(() => {
+    fetch('/parties').then(response =>
+      response.json().then(data => {
+        var partyArr = {};
+        partyArr[null] = "No Party";
+        for(var i=0;i<data.length;i++){
+          partyArr[data[i].id] = data[i].party_name;
+        }
+				setParties(partyArr);
+      })
+    );
+  }, [])
+
   return (
     <TableBody>
-    {parties.map((row) => {
+    {candidates.map((row) => {
       return (
-      <StyledTableRow key={row.party_name}>
+      <StyledTableRow key={row.candidate_name}>
         <StyledTableCell component="th" scope="row">
-          {row.party_name}
+          {row.candidate_name}
         </StyledTableCell>
+        <StyledTableCell>{parties[row.party_id]}</StyledTableCell>
         <StyledTableCell align="center">{voting_events[row.v_event_id]}</StyledTableCell>
+        <StyledTableCell align="right">{excludeArr[row.exclude]}</StyledTableCell>
         <StyledTableCell align="right">
-          <Link to={"/parties/"+row.id}>
+          <Link to={"/candidates/"+row.id}>
             <Button variant="contained">
               View
             </Button>
           </Link>
         </StyledTableCell>
         <StyledTableCell align="right">
-          <Link to={"/parties/update/"+row.id}>
+          <Link to={"/candidates/update/"+row.id}>
             <Button variant="contained" color="primary">
               Edit
             </Button>
@@ -74,14 +92,14 @@ export default function PartyRows({parties }){
           <Button variant="contained"
             color="secondary"
             onClick={async() => {
-              const response = await fetch("/parties/"+row.id+"/delete", {
+              const response = await fetch("/candidates/"+row.id+"/delete", {
           			method: "DELETE"
           		});
           		if(response.ok) {
-          			console.log("Deleted party");
-          			window.location.replace("/parties");
+          			console.log("Deleted candidate");
+          			window.location.replace("/candidates");
           		} else {
-          			console.log("Didnt delete party");
+          			console.log("Didnt delete candidate");
           		}
             }}>
               Delete
