@@ -17,9 +17,13 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+const excludeArr = {0: "Included", 1: "Excluded"};
+
 export default function VotingEventShow(props) {
   const id = props.match.params.id;
 	const classes = useStyles();
+  const [candidates, setCandidates] = useState([]);
+  const [parties, setParties] = useState([]);
 	const [event_name, setEventName] = useState("");
 	const [year, setEventYear] = useState("");
 	const [vote_start, setVoteStart] = useState("");
@@ -46,7 +50,26 @@ export default function VotingEventShow(props) {
           setEventYear(data.year);
           setVoteStart(vstart);
           setVoteEnd(vend);
-          console.log(data);
+        })
+      );
+    }
+  }, [])
+
+  useEffect(() => {
+    if(id) {
+      fetch('/candidates?v_event_id='+id).then(response =>
+        response.json().then(data => {
+          setCandidates(data);
+        })
+      );
+    }
+  }, [])
+
+  useEffect(() => {
+    if(id) {
+      fetch('/parties?v_event_id='+id).then(response =>
+        response.json().then(data => {
+          setParties(data);
         })
       );
     }
@@ -59,6 +82,18 @@ export default function VotingEventShow(props) {
     <h2>Year: {year}</h2>
     <h3>Vote Start Date: {vote_start}</h3>
     <h3>Vote Start End: {vote_end}</h3>
+    <h3><u>Associated Parties</u></h3>
+    {parties.map((row) => {
+      return (
+        <h3>{row.party_name}</h3>
+      )
+    })}
+    <h3><u>Associated Candidates</u></h3>
+    {candidates.map((row) => {
+      return (
+        <h3>[{excludeArr[row.exclude]}] {row.candidate_name} (Ballot Order: {row.candidate_order})</h3>
+      )
+    })}
     <Link to={"/voting_events/update/"+id}>
       <Button variant="contained" color="primary">
         Edit
