@@ -24,6 +24,7 @@ export default function VotingEventShow(props) {
 	const classes = useStyles();
   const [candidates, setCandidates] = useState([]);
   const [parties, setParties] = useState([]);
+  const [partiesDict, setPartiesDict] = useState([]);
 	const [event_name, setEventName] = useState("");
 	const [year, setEventYear] = useState("");
 	const [vote_start, setVoteStart] = useState("");
@@ -70,6 +71,12 @@ export default function VotingEventShow(props) {
       fetch('/parties?v_event_id='+id).then(response =>
         response.json().then(data => {
           setParties(data);
+          var partyArr = {};
+          partyArr[null] = "No Party";
+          for(var i=0;i<data.length;i++){
+            partyArr[data[i].id] = data[i].party_name;
+          }
+  				setPartiesDict(partyArr);
         })
       );
     }
@@ -91,7 +98,7 @@ export default function VotingEventShow(props) {
     <h3><u>Associated Candidates</u></h3>
     {candidates.map((row) => {
       return (
-        <h3>[{excludeArr[row.exclude]}] {row.candidate_name} (Ballot Order: {row.candidate_order})</h3>
+        <h3>[{excludeArr[row.exclude]}] {partiesDict[row.party_id]} - {row.candidate_name} (Ballot Order: {row.candidate_order})</h3>
       )
     })}
     <Link to={"/voting_events/update/"+id}>
