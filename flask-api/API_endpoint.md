@@ -16,7 +16,7 @@ Requires a JSON object with the following fields:
 ```json
 {
     "username" : "some username, must be unique",
-    "password" : "some string, not limitation/restrictions yet. Is salt hased",
+    "password" : "some string, not limitation/restrictions yet. Is salt hashed",
     "full_name" : "some name",
     "user_type" : "voter/commissioner"
 }
@@ -90,7 +90,7 @@ If the `above` field is filled, it **must contain 6 objects**.
 If the `below` field is filled, it **must contain 12 objects**.
 `v_event_id` must be a valid event ID.
 
-Returns 204 upon success.
+Returns 201 upon success with no body.
 
 If the date format needs to be changed, ping me (Ben) on Discord.
 
@@ -110,7 +110,12 @@ Requires a JSON object with the following fields:
 }
 ```
 
-Returns 204 upon success.
+Returns 201 upon success with body:
+```json
+{
+  "id": "a number"
+}
+```
 
 If the date format needs to be changed, ping me (Ben) on Discord.
 
@@ -259,7 +264,12 @@ Requires a JSON object with the following fields:
 }
 ```
 
-Returns 204 upon success.
+Returns 201 upon success with body:
+```json
+{
+  "id": "a number"
+}
+```
 
 ### Get by ID
 
@@ -342,7 +352,12 @@ Optional fields of `party_id` and `candidate_order` can be provided if the candi
 }
 ```
 
-Returns 204 upon success.
+Returns 201 upon success with body:
+```json
+{
+  "id": "a number"
+}
+```
 
 ### Get by ID
 

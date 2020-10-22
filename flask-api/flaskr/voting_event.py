@@ -1,6 +1,6 @@
 from flask import Blueprint, abort, jsonify, request, make_response
 from flaskr.db import get_db
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required, get_jwt_claims
 from datetime import datetime
 import json
 
@@ -9,6 +9,11 @@ bp = Blueprint('voting_events', __name__, url_prefix='/voting-events')
 @bp.route('/create', methods=['POST'])
 @jwt_required
 def create():
+    # Check Authorisation
+    token = get_jwt_claims()
+    if token['user_type'] != 'commissioner':
+        abort(403, 'Forbidden')
+
     if not(request.data):
         abort(400, 'Bad Request')
 
@@ -21,15 +26,18 @@ def create():
         abort(400, 'Bad Request')
 
     db = get_db()
+    cursor = db.cursor()
 
     # Save to DB
-    db.execute(
+    cursor.execute(
         'INSERT INTO voting_event (event_name, year, vote_start, vote_end) VALUES (?, ?, ?, ?)',
         (event_name, year, vote_start, vote_end)
     )
     db.commit()
 
-    return '', 204
+    resp = make_response({"id": cursor.lastrowid}, 201)
+    resp.headers['Content-Type'] = 'application/json'
+    return resp
 
 @bp.route('/<int:voting_event_id>', methods=['GET'])
 @jwt_required
@@ -79,6 +87,11 @@ def getList():
 @bp.route('/<int:voting_event_id>/tally', methods=['GET'])
 @jwt_required
 def tally(voting_event_id):
+    # Check Authorisation
+    token = get_jwt_claims()
+    if token['user_type'] != 'commissioner':
+        abort(403, 'Forbidden')
+        
     db = get_db()
     cursor = db.cursor()
     votes = cursor.execute(
@@ -90,14 +103,12 @@ def tally(voting_event_id):
         abort(404, 'Not Found')
 
     # Grab parties and candidates
-    cursor = db.cursor()
     parties = cursor.execute(
         'SELECT * FROM party WHERE v_event_id = ?',
         (voting_event_id,)
     ).fetchall()
     party_id_list = list(map(lambda party: party['id'], parties))
 
-    cursor = db.cursor()
     candidates = cursor.execute(
         'SELECT * FROM candidate WHERE v_event_id = ?',
         (voting_event_id,)
@@ -163,6 +174,11 @@ def tally(voting_event_id):
 @bp.route('/<int:voting_event_id>/update', methods=['PUT'])
 @jwt_required
 def update(voting_event_id):
+    # Check Authorisation
+    token = get_jwt_claims()
+    if token['user_type'] != 'commissioner':
+        abort(403, 'Forbidden')
+
     if not(request.data):
         abort(400, 'Bad Request')
 
@@ -197,10 +213,16 @@ def update(voting_event_id):
 @bp.route('/<int:voting_event_id>/delete', methods=['DELETE'])
 @jwt_required
 def delete(voting_event_id):
+    # Check Authorisation
+    token = get_jwt_claims()
+    if token['user_type'] != 'commissioner':
+        abort(403, 'Forbidden')
+
     db = get_db()
+    cursor = db.cursor()
 
     # Save to DB
-    db.execute(
+    cursor.execute(
         'DELETE FROM voting_event WHERE id = ?', (voting_event_id,)
     )
 

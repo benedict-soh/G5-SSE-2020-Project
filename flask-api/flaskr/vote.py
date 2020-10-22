@@ -8,6 +8,11 @@ bp = Blueprint('votes', __name__, url_prefix='/votes')
 @bp.route('/create', methods=['POST'])
 @jwt_required
 def create():
+    # Check Authorisation
+    token = get_jwt_claims()
+    if token['user_type'] != 'voter':
+        abort(403, 'Forbidden')
+
     if not(request.data):
         abort(400, 'Bad Request')
 
@@ -22,9 +27,9 @@ def create():
     user_id = token['id']
 
     db = get_db()
+    cursor = db.cursor()
 
     # Validate v_event_id
-    cursor = db.cursor()
     v_event = cursor.execute(
         'SELECT * FROM voting_event WHERE id = ?',
         (v_event_id,)
@@ -34,7 +39,6 @@ def create():
         abort(400, 'Bad Request')
 
     # Check if user has voted
-    cursor = db.cursor()
     v_status = cursor.execute(
         'SELECT * FROM vote_status WHERE v_event_id = ? AND user_id = ?',
         (v_event_id, user_id)
@@ -44,14 +48,12 @@ def create():
         abort(400, 'Bad Request')
 
     # Validate vote data
-    cursor = db.cursor()
     parties = cursor.execute(
         'SELECT * FROM party WHERE v_event_id = ?',
         (v_event_id,)
     ).fetchall()
     party_id_list = list(map(lambda party: party['id'], parties))
 
-    cursor = db.cursor()
     candidates = cursor.execute(
         'SELECT * FROM candidate WHERE v_event_id = ?',
         (v_event_id,)
@@ -107,24 +109,24 @@ def create():
         abort(400, 'Bad Request')
 
     # Create vote_data
-    db.execute('INSERT INTO vote_data (vote_data_blob, v_event_id) VALUES (?, ?)',
+    cursor.execute('INSERT INTO vote_data (vote_data_blob, v_event_id) VALUES (?, ?)',
                   (json.dumps(vote_data), v_event_id)
     )
 
     # Create vote_status
-    db.execute('INSERT INTO vote_status (user_id, v_event_id) VALUES (?, ?)',
+    cursor.execute('INSERT INTO vote_status (user_id, v_event_id) VALUES (?, ?)',
                   (user_id, v_event_id)
     )
 
     db.commit()
 
-    return '', 204
+    return '', 201
 
 # THIS ENDPOINT IS TO CHECK IF CREATE WORKS, DELETE LATER
 @bp.route('', methods=['GET'])
 @jwt_required
 def get():
-    # abort(403, 'Forbidden')
+    abort(403, 'Forbidden')
 
     db = get_db()
     cursor = db.cursor()
@@ -148,7 +150,7 @@ def get():
 @bp.route('/status', methods=['GET'])
 @jwt_required
 def getStatus():
-    # abort(403, 'Forbidden')
+    abort(403, 'Forbidden')
 
     db = get_db()
     cursor = db.cursor()
@@ -172,7 +174,7 @@ def getStatus():
 @bp.route('/delete', methods=['DELETE'])
 @jwt_required
 def delete():
-    # abort(403, 'Forbidden')
+    abort(403, 'Forbidden')
 
     # Get User ID
     token = get_jwt_claims()
