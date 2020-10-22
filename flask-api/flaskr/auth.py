@@ -5,7 +5,7 @@ from flask import (
 )
 
 from flask_jwt_extended import (
-    jwt_required, create_access_token,
+    jwt_required, create_access_token, get_jwt_claims,
     get_jwt_identity, set_access_cookies, unset_jwt_cookies
 )
 

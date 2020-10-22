@@ -1,6 +1,6 @@
 from flask import Blueprint, abort, jsonify, request, make_response
 from flaskr.db import get_db
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required, get_jwt_claims
 import json
 
 bp = Blueprint('candidates', __name__, url_prefix='/candidates')
@@ -8,6 +8,11 @@ bp = Blueprint('candidates', __name__, url_prefix='/candidates')
 @bp.route('/create', methods=['POST'])
 @jwt_required
 def create():
+    # Check Authorisation
+    token = get_jwt_claims()
+    if token['user_type'] != 'commissioner':
+        abort(403, 'Forbidden')
+
     if not(request.data):
         abort(400, 'Bad Request')
 
@@ -26,10 +31,11 @@ def create():
         candidate_order = None
 
     db = get_db()
+    cursor = db.cursor()
 
     # Check if the Party exists
     if (party_id != None):
-        party = db.execute(
+        party = cursor.execute(
             'SELECT * FROM party WHERE id = ?', (party_id,)
         ).fetchone()
 
@@ -37,14 +43,14 @@ def create():
             abort(400, 'Bad Request')
 
         # Check member count and order
-        candidates = db.execute(
+        candidates = cursor.execute(
             'SELECT * FROM candidate WHERE party_id = ?',
             (party_id,)
         ).fetchall()
         count = len(candidates)
 
     # Check if the Voting Event exists
-    v_event = db.execute(
+    v_event = cursor.execute(
         'SELECT * FROM voting_event WHERE id = ?', (v_event_id,)
     ).fetchone()
 
@@ -55,13 +61,15 @@ def create():
         candidate_order = count + 1
 
     # Save to DB
-    db.execute(
+    cursor.execute(
         'INSERT INTO candidate (candidate_name, party_id, v_event_id, candidate_order, exclude) VALUES (?, ?, ?, ?, ?)',
         (candidate_name, party_id, v_event_id, candidate_order, exclude)
     )
     db.commit()
 
-    return '', 204
+    resp = make_response({"id": cursor.lastrowid}, 201)
+    resp.headers['Content-Type'] = 'application/json'
+    return resp
 
 @bp.route('/<candidate_id>', methods=['GET'])
 @jwt_required
@@ -149,6 +157,11 @@ def getList():
 @bp.route('/<int:candidate_id>/update', methods=['PUT'])
 @jwt_required
 def update(candidate_id):
+    # Check Authorisation
+    token = get_jwt_claims()
+    if token['user_type'] != 'commissioner':
+        abort(403, 'Forbidden')
+
     if not(request.data):
         abort(400, 'Bad Request')
 
@@ -167,10 +180,11 @@ def update(candidate_id):
         candidate_order = None
 
     db = get_db()
+    cursor = db.cursor()
 
     # Check if the Party exists
     if (party_id != None):
-        party = db.execute(
+        party = cursor.execute(
             'SELECT * FROM party WHERE id = ?', (party_id,)
         ).fetchone()
 
@@ -178,14 +192,14 @@ def update(candidate_id):
             abort(400, 'Bad Request')
 
         # Check member count and order
-        candidates = db.execute(
+        candidates = cursor.execute(
             'SELECT * FROM candidate WHERE party_id = ?',
             (party_id,)
         ).fetchall()
         count = len(candidates)
 
     # Check if the Voting Event exists
-    v_event = db.execute(
+    v_event = cursor.execute(
         'SELECT * FROM voting_event WHERE id = ?', (v_event_id,)
     ).fetchone()
 
@@ -193,7 +207,7 @@ def update(candidate_id):
         abort(400, 'Bad Request')
 
     # Update DB
-    db.execute(
+    cursor.execute(
         'UPDATE candidate SET candidate_name = ?, party_id = ?, v_event_id = ?, candidate_order = ?, exclude = ? WHERE id = ?',
         (candidate_name, party_id, v_event_id, candidate_order, exclude, candidate_id)
     )
@@ -204,10 +218,16 @@ def update(candidate_id):
 @bp.route('/<int:candidate_id>/delete', methods=['DELETE'])
 @jwt_required
 def delete(candidate_id):
+    # Check Authorisation
+    token = get_jwt_claims()
+    if token['user_type'] != 'commissioner':
+        abort(403, 'Forbidden')
+
     db = get_db()
+    cursor = db.cursor()
 
     # Save to DB
-    db.execute(
+    cursor.execute(
         'DELETE FROM candidate WHERE id = ?', (candidate_id,)
     )
 
