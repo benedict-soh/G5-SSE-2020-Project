@@ -1,8 +1,9 @@
 import React, {Component, useEffect, useState} from 'react';
 import NavigationTopBar from '../navigation/NavigationTopBar'
-import {Route, withRouter, Switch} from "react-router-dom";
-import { TextField,Button } from '@material-ui/core';
+import {Route, withRouter, Switch, Link} from "react-router-dom";
+import { TextField,Button,Select,MenuItem } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
+
 import '../App.css';
 
 const useStyles = makeStyles((theme) => ({
@@ -18,8 +19,9 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function PartyForm({party, party_id}) {
-	const classes = useStyles();
-	const [party_name, setEventName] = useState("");
+  const classes = useStyles();
+  const [voting_events, setVotingEvents] = useState([]);
+	const [party_name, setPartyName] = useState("");
 	const [v_event_id, setEventID] = useState("");
 	var CRUD = "Create";
 	if(party){
@@ -31,7 +33,15 @@ export default function PartyForm({party, party_id}) {
 			setPartyName(party.party_name);
 			setEventID(party.v_event_id);
 		}
-	},[voteEvent])
+	},[party])
+
+  useEffect(() => {
+    fetch('/voting-events').then(response =>
+      response.json().then(data => {
+				setVotingEvents(data);
+      })
+    );
+  }, [])
 
 	const createParty = async () => {
 		console.log("Create");
@@ -51,7 +61,7 @@ export default function PartyForm({party, party_id}) {
 		}
 	}
 
-	const updateEvent = async () => {
+	const updateParty = async () => {
 		console.log("Update");
 		const updateParty = {party_name, v_event_id};
 		const response = await fetch("/parties/"+party_id+"/update", {
@@ -69,29 +79,53 @@ export default function PartyForm({party, party_id}) {
 		}
 	}
 
+  var date;
+  var day;
+  var mon;
+  var year;
+  var vstart;
+  var vend;
 	return(
 		<form className={classes.root} noValidate autoComplete="off">
 		<h1>{CRUD} Party</h1>
 		<div>
 			<TextField
 				required
-				id="event-name"
-				label="Event Name"
-				value={event_name}
-				onChange={(event) => setEventName(event.target.value)}
-				helperText="Name of the voting event"
+				id="party-name"
+				label="Party Name"
+				value={party_name}
+				onChange={(event) => setPartyName(event.target.value)}
+				helperText="Name of the political party"
 				variant="outlined"
 			/>
-			<TextField
-				required
-				id="year"
-				label="Event Year"
-				value={year}
-				onChange={(event) => setEventYear(event.target.value)}
-				type="number"
-				helperText="Year of the voting event"
-				variant="outlined"
-			/>
+      <TextField
+        required
+        id="v_event_id"
+        select
+        label="Voting Event"
+        value={v_event_id}
+        onChange={(event) => setEventID(event.target.value)}
+        helperText="Associated voting event"
+        variant="outlined"
+      >
+      return (
+        {voting_events.map((row) => {
+          date = new Date(row.vote_start);
+          day = date.getDate();
+          mon = date.getMonth() + 1;
+          year = date.getFullYear();
+          vstart = day + "/" + mon + "/" + year;
+          date = new Date(row.vote_end);
+          day = date.getDate();
+          mon = date.getMonth() + 1;
+          year = date.getFullYear();
+          vend = day + "/" + mon + "/" + year;
+          return (
+            <MenuItem value={row.id}>{row.event_name} ({row.year}): {vstart} - {vend}</MenuItem>
+          )
+        })}
+      )
+      </TextField>
 		</div>
 		<div className={classes.root}>
 			<Button variant="contained" color="primary" onClick={ e => {
@@ -100,54 +134,14 @@ export default function PartyForm({party, party_id}) {
 				:
 					createParty()}
 			}>
-        {CRUD} Event
+        {CRUD} Party
       </Button>
-			<Button variant="contained" color="secondary">
-        Cancel
-      </Button>
+      <Link to={"/parties/"}>
+  			<Button variant="contained" color="secondary">
+          Cancel
+        </Button>
+      </Link>
 		</div>
 		</form>
 		)
 }
-
-
-// <form>
-// 			<h2>Voting Event {CRUD} Page</h2>
-// 			<label for="event_name">Event name:</label>
-// 			<input
-// 				id="event_name"
-// 				type="text"
-// 				value={event_name}
-// 				onChange={(event) => setEventName(event.target.value)}
-// 				placeholder="Event Name"
-// 				required />
-// 			<label for="year">Event Year:</label>
-// 			<input
-// 				id="year"
-// 				type="number"
-// 				value={year}
-// 				onChange={(event) => setEventYear(event.target.value)}
-// 				placeholder="2020"
-// 				required />
-// 			<label for="vote_start">Vote Start Date:</label>
-// 			<input
-// 				id="vote_start"
-// 				type="date"
-// 				value={vote_start}
-// 				onChange={(event) => setVoteStart(event.target.value)}
-// 				required />
-// 			<label for="vote_end">Vote End Date:</label>
-// 			<input
-// 				id="vote_end"
-// 				type="date"
-// 				value={vote_end}
-// 				onChange={(event) => setVoteEnd(event.target.value)}
-// 				required />
-// 			<button type="button" onClick={ e => {
-// 				voteEvent ?
-// 					updateEvent()
-// 				:
-// 					createEvent()}
-// 			}>
-// 			Submit Event</button>
-// </form>

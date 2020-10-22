@@ -1,6 +1,6 @@
 import React, {Component, useEffect, useState} from 'react';
 import NavigationTopBar from '../navigation/NavigationTopBar'
-import {Route, withRouter, Switch} from "react-router-dom";
+import {Route, withRouter, Switch, Link} from "react-router-dom";
 import { TextField,Button } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import '../App.css';
@@ -134,9 +134,11 @@ export default function VotingEventForm({voteEvent, event_id}) {
 			}>
         {CRUD} Event
       </Button>
-			<Button variant="contained" color="secondary">
-        Cancel
-      </Button>
+      <Link to={"/voting_events/"}>
+  			<Button variant="contained" color="secondary">
+          Cancel
+        </Button>
+      </Link>
 		</div>
 		</form>
 		)

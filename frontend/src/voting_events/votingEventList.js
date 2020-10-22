@@ -1,8 +1,9 @@
 import React, {Component, useEffect, useState} from 'react';
 import NavigationTopBar from '../navigation/NavigationTopBar'
-import {Route, withRouter, Switch} from "react-router-dom";
+import {Route, withRouter, Switch, Link} from "react-router-dom";
 import { withStyles, makeStyles } from '@material-ui/core/styles';
 import VotingEventRows from '../components/voting_events_rows'
+import Button from '@material-ui/core/Button';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -35,12 +36,6 @@ export default function VotingEventList() {
   useEffect(() => {
     fetch('/voting-events').then(response =>
       response.json().then(data => {
-        // for(var i=0;i<data.length;i++) {
-        //   rows.push({data[i].id, data[i].event_name, data[i].vote_start, data[i].vote_end});
-        // }
-
-
-        // setEvents(data.events);
 				setVotingEvents(data);
         console.log("Test");
 				console.log(data);
@@ -50,6 +45,11 @@ export default function VotingEventList() {
 
 	return(
 			<div style={{ height: 300, width: '100%' }}>
+        <Link to={"/voting_events/create/"}>
+          <Button variant="contained" color="primary">
+            Create New Event
+          </Button>
+        </Link>
         <TableContainer component={Paper}>
         <Table className={classes.table} aria-label="customized table">
           <TableHead>

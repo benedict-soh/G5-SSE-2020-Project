@@ -20,18 +20,24 @@ const useStyles = makeStyles((theme) => ({
 export default function PartyShow(props) {
   const id = props.match.params.id;
 	const classes = useStyles();
-	const [event_name, setEventName] = useState("");
+  const [party_name, setPartyName] = useState("");
+	const [v_event_id, setEventID] = useState("");
+  const [event_name, setEventName] = useState("");
 	const [year, setEventYear] = useState("");
 	const [vote_start, setVoteStart] = useState("");
 	const [vote_end, setVoteEnd] = useState("");
 
   useEffect(() => {
     if(id) {
-      fetch('/voting-events/'+id).then(response =>
-        response.json().then(data => {
-          // setEvents(data.events);
-
-          // Format the data
+      fetch('/parties/'+id).then(responseParty =>
+        responseParty.json().then(dataParty => {
+          setPartyName(dataParty.party_name);
+          setEventID(dataParty.v_event_id);
+          return fetch('/voting-events/'+dataParty.v_event_id);
+        }).then(function(response) {
+          return response.json();
+        }).then(function(data) {
+          console.log(data);
           var date = new Date(data.vote_start);
           var day = ('0' + date.getDate()).slice(-2);
           var mon = ('0' + (date.getMonth() + 1)).slice(-2);
@@ -46,7 +52,6 @@ export default function PartyShow(props) {
           setEventYear(data.year);
           setVoteStart(vstart);
           setVoteEnd(vend);
-          console.log(data);
         })
       );
     }
@@ -55,11 +60,13 @@ export default function PartyShow(props) {
 	return(
 		<div>
     <h1>ID: {id}</h1>
-		<h1>{event_name}</h1>
-    <h2>Year: {year}</h2>
+		<h1>{party_name}</h1>
+    <h3><u>Associated Voting Event Information</u></h3>
+    <h3>Event Name: {event_name}</h3>
+    <h3>Year: {year}</h3>
     <h3>Vote Start Date: {vote_start}</h3>
     <h3>Vote Start End: {vote_end}</h3>
-    <Link to={"/voting_events/update/"+id}>
+    <Link to={"/parties/update/"+id}>
       <Button variant="contained" color="primary">
         Edit
       </Button>
@@ -67,21 +74,21 @@ export default function PartyShow(props) {
     <Button variant="contained"
       color="secondary"
       onClick={async() => {
-        const response = await fetch("/voting-events/"+id+"/delete", {
+        const response = await fetch("/parties/"+id+"/delete", {
           method: "DELETE"
         });
         if(response.ok) {
-          console.log("Deleted event");
-          window.location.replace("/voting_events");
+          console.log("Deleted party");
+          window.location.replace("/parties");
         } else {
-          console.log("Didnt delete event");
+          console.log("Didnt delete party");
         }
       }}>
         Delete
     </Button>
-    <Link to={"/voting_events/"}>
+    <Link to={"/parties/"}>
       <Button variant="contained">
-        Back to Voting Events
+        Back to Parties
       </Button>
     </Link>
 		</div>
