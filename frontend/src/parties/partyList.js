@@ -28,7 +28,7 @@ const useStyles = makeStyles({
   },
 });
 
-export default function VotingEventList() {
+export default function PartyList() {
 	const [voting_events, setVotingEvents] = useState([]);
   const classes = useStyles();
 

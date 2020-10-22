@@ -61,6 +61,13 @@ export default function VotingEventRows({voting_events }){
         <StyledTableCell align="right">{vstart}</StyledTableCell>
         <StyledTableCell align="right">{vend}</StyledTableCell>
         <StyledTableCell align="right">
+          <Link to={"/voting_events/"+row.id}>
+            <Button variant="contained">
+              View
+            </Button>
+          </Link>
+        </StyledTableCell>
+        <StyledTableCell align="right">
           <Link to={"/voting_events/update/"+row.id}>
             <Button variant="contained" color="primary">
               Edit

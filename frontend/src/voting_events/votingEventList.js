@@ -58,6 +58,7 @@ export default function VotingEventList() {
               <StyledTableCell align="right">Year</StyledTableCell>
               <StyledTableCell align="right">Vote Start Date</StyledTableCell>
               <StyledTableCell align="right">Vote End Date</StyledTableCell>
+              <StyledTableCell align="right">View Event</StyledTableCell>
               <StyledTableCell align="right">Edit Event</StyledTableCell>
               <StyledTableCell align="right">Delete Event</StyledTableCell>
             </TableRow>

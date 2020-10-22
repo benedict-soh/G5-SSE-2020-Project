@@ -17,65 +17,61 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function VotingEventForm({voteEvent, event_id}) {
+export default function PartyForm({party, party_id}) {
 	const classes = useStyles();
-	const [event_name, setEventName] = useState("");
-	const [year, setEventYear] = useState("");
-	const [vote_start, setVoteStart] = useState("");
-	const [vote_end, setVoteEnd] = useState("");
+	const [party_name, setEventName] = useState("");
+	const [v_event_id, setEventID] = useState("");
 	var CRUD = "Create";
-	if(voteEvent){
+	if(party){
 		CRUD = "Update";
 	}
 
 	useEffect(()=>{
-		if(voteEvent){
-			setEventName(voteEvent.event_name);
-			setEventYear(voteEvent.year);
-			setVoteStart(voteEvent.vote_start);
-			setVoteEnd(voteEvent.vote_end);
+		if(party){
+			setPartyName(party.party_name);
+			setEventID(party.v_event_id);
 		}
 	},[voteEvent])
 
-	const createEvent = async () => {
+	const createParty = async () => {
 		console.log("Create");
-		const newEvent = {event_name, year, vote_start, vote_end};
-		const response = await fetch("/voting-events/create", {
+		const newParty = {party_name, v_event_id};
+		const response = await fetch("/parties/create", {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json"
 			},
-			body: JSON.stringify(newEvent)
+			body: JSON.stringify(newParty)
 		});
 		if(response.ok) {
-			console.log("Created event");
-			window.location.replace("/voting_events");
+			console.log("Created party");
+			window.location.replace("/parties");
 		} else {
-			console.log("Didnt create event");
+			console.log("Didnt create party");
 		}
 	}
 
 	const updateEvent = async () => {
 		console.log("Update");
-		const updateEvent = {event_name, year, vote_start, vote_end};
-		const response = await fetch("/voting-events/"+event_id+"/update", {
+		const updateParty = {party_name, v_event_id};
+		const response = await fetch("/parties/"+party_id+"/update", {
 			method: "PUT",
 			headers: {
 				"Content-Type": "application/json"
 			},
-			body: JSON.stringify(updateEvent)
+			body: JSON.stringify(updateParty)
 		});
 		if(response.status == "204") {
-			console.log("Updated event");
-			window.location.replace("/voting_events");
+			console.log("Updated party");
+			window.location.replace("/parties");
 		} else {
-			console.log("Didnt update event");
+			console.log("Didnt update party");
 		}
 	}
 
 	return(
 		<form className={classes.root} noValidate autoComplete="off">
-		<h1>{CRUD} Voting Event</h1>
+		<h1>{CRUD} Party</h1>
 		<div>
 			<TextField
 				required
@@ -97,40 +93,12 @@ export default function VotingEventForm({voteEvent, event_id}) {
 				variant="outlined"
 			/>
 		</div>
-		<div>
-			<TextField
-				required
-				id="vote_start"
-				label="Vote Start Date"
-				value={vote_start}
-				onChange={(event) => setVoteStart(event.target.value)}
-				type="date"
-				helperText="Start date of the voting event"
-				variant="outlined"
-				InputLabelProps={{
-					shrink: true,
-				}}
-			/>
-			<TextField
-				required
-				id="vote_end"
-				label="Vote End Date"
-				value={vote_end}
-				onChange={(event) => setVoteEnd(event.target.value)}
-				type="date"
-				helperText="End date of the voting event"
-				variant="outlined"
-				InputLabelProps={{
-					shrink: true,
-				}}
-			/>
-		</div>
 		<div className={classes.root}>
 			<Button variant="contained" color="primary" onClick={ e => {
-				voteEvent ?
-					updateEvent()
+				party ?
+					updateParty()
 				:
-					createEvent()}
+					createParty()}
 			}>
         {CRUD} Event
       </Button>
