@@ -25,6 +25,10 @@ def create():
     except:
         abort(400, 'Bad Request')
 
+    # validate if vote_start and vote_end is logical
+    if vote_start > vote_end:
+        abort(400, 'Bad Request')
+
     db = get_db()
     cursor = db.cursor()
 
@@ -95,10 +99,13 @@ def getListByUserId():
 
     print(user_id)
 
+    current_time = datetime.now()
+
     db = get_db()
     cursor = db.cursor()
     v_events = cursor.execute(
-        'SELECT * FROM voting_event'
+        'SELECT * FROM voting_event WHERE voting_event.vote_start < ? AND voting_event.vote_end > ?',
+        (current_time, current_time)
     ).fetchall()
     event_id_list = list(map(lambda v_event: v_event['id'], v_events))
 
@@ -112,6 +119,7 @@ def getListByUserId():
     resp = make_response({"v_event_id_list": open_events}, 200)
     resp.headers['Content-Type'] = 'application/json'
     return resp
+
 
 @bp.route('/<int:voting_event_id>/tally', methods=['GET'])
 @jwt_required
@@ -217,6 +225,10 @@ def update(voting_event_id):
         vote_start = datetime.strptime(request.json['vote_start'], '%Y-%m-%d')
         vote_end = datetime.strptime(request.json['vote_end'], '%Y-%m-%d')
     except:
+        abort(400, 'Bad Request')
+
+    # validate if vote_start and vote_end is logical
+    if vote_start > vote_end:
         abort(400, 'Bad Request')
 
     db = get_db()

@@ -1,6 +1,7 @@
 from flask import Blueprint, abort, jsonify, request, make_response
 from flaskr.db import get_db
 from flask_jwt_extended import jwt_required, get_jwt_claims
+from datetime import datetime
 import json
 
 bp = Blueprint('votes', __name__, url_prefix='/votes')
@@ -36,6 +37,13 @@ def create():
     ).fetchone()
 
     if v_event is None:
+        abort(400, 'Bad Request')
+
+    # Check if currently time is within designated voting time period
+    current_time = datetime.now()
+
+    if current_time < v_event['vote_start'] or current_time > v_event['vote_end']:
+        print("bad time")
         abort(400, 'Bad Request')
 
     # Check if user has voted
