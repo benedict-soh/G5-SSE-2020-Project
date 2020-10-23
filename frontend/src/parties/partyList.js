@@ -2,7 +2,7 @@ import React, {Component, useEffect, useState} from 'react';
 import NavigationTopBar from '../navigation/NavigationTopBar'
 import {Route, withRouter, Switch, Link} from "react-router-dom";
 import { withStyles, makeStyles } from '@material-ui/core/styles';
-import VotingEventRows from '../components/voting_events_rows'
+import PartyRows from '../components/party_rows'
 import Button from '@material-ui/core/Button';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -29,46 +29,39 @@ const useStyles = makeStyles({
   },
 });
 
-export default function VotingEventList() {
-	const [voting_events, setVotingEvents] = useState([]);
+export default function PartyList() {
+	const [parties, setParties] = useState([]);
   const classes = useStyles();
 
   useEffect(() => {
-    fetch('/voting-events').then(response =>
+    fetch('/parties').then(response =>
       response.json().then(data => {
-				setVotingEvents(data);
-        console.log("Test");
-				console.log(data);
+				setParties(data);
       })
     );
   }, [])
 
 	return(
 			<div style={{ height: 300, width: '100%' }}>
-        <Link to={"/voting_events/create/"}>
+        <Link to={"/parties/create/"}>
           <Button variant="contained" color="primary">
-            Create New Event
+            Create New Party
           </Button>
         </Link>
         <TableContainer component={Paper}>
         <Table className={classes.table} aria-label="customized table">
           <TableHead>
             <TableRow>
-              <StyledTableCell>Event Name</StyledTableCell>
-              <StyledTableCell align="right">Year</StyledTableCell>
-              <StyledTableCell align="right">Vote Start Date</StyledTableCell>
-              <StyledTableCell align="right">Vote End Date</StyledTableCell>
-              <StyledTableCell align="right">View Event</StyledTableCell>
-              <StyledTableCell align="right">Edit Event</StyledTableCell>
-              <StyledTableCell align="right">Delete Event</StyledTableCell>
+              <StyledTableCell>Party Name</StyledTableCell>
+              <StyledTableCell align="center">Voting Event</StyledTableCell>
+              <StyledTableCell align="right">View Party</StyledTableCell>
+              <StyledTableCell align="right">Edit Party</StyledTableCell>
+              <StyledTableCell align="right">Delete Party</StyledTableCell>
             </TableRow>
           </TableHead>
-          <VotingEventRows voting_events={voting_events} />
+          <PartyRows parties={parties} />
         </Table>
       </TableContainer>
     </div>
 		);
 }
-
-// <h2>Voting Event Read Page</h2>
-// <VotingEvent voting_events={voting_events} />

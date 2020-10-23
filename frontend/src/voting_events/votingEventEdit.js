@@ -13,9 +13,22 @@ export default function VotingEventEdit(props) {
       fetch('/voting-events/'+id).then(response =>
         response.json().then(data => {
           // setEvents(data.events);
-          setVoteEvent(data);
-          console.log(id);
+
+          // Format the data
+          var date = new Date(data.vote_start);
+          var day = ('0' + date.getDate()).slice(-2);
+          var mon = ('0' + (date.getMonth() + 1)).slice(-2);
+          var year = date.getFullYear();
+          var vstart = year + "-" + mon + "-" + day;
+          date = new Date(data.vote_end);
+          day = ('0' + date.getDate()).slice(-2);
+          mon = ('0' + (date.getMonth() + 1)).slice(-2);
+          year = date.getFullYear();
+          var vend = year + "-" + mon + "-" + day;
+          data.vote_start = vstart;
+          data.vote_end = vend;
           console.log(data);
+          setVoteEvent(data);
         })
       );
     }
