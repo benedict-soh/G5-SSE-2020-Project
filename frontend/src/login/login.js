@@ -12,6 +12,7 @@ import {Alert} from '@material-ui/lab';
 import { Redirect } from "react-router-dom";
 import {authActions} from "../utils/store";
 import connect from "react-redux/lib/connect/connect";
+import { ReCaptcha } from 'react-recaptcha-google'
 
 class loginPage extends Component {
     constructor(props) {
@@ -19,24 +20,37 @@ class loginPage extends Component {
         this.state = {
             isPageLoading: true,
             isLoading: false,
+            isRobot: true,
             error: "",
         };
         this.login = this.login.bind(this);
+        this.onLoadRecaptcha = this.onLoadRecaptcha.bind(this);
+        this.verifyCallback = this.verifyCallback.bind(this);
     }
     componentWillMount() {
         this.checkAuth();
+    }
+    componentDidMount() {
+        if (this.captchaDemo) {
+            this.captchaDemo.reset();
+        }
     }
 
     // the main login function that handles responses
     login(username, password) {
         this.setState({isLoading: true, error: ""});
-        login_request(username, password)
-            .then(r => {
-                console.log(r);
-                this.props.login();
-            }).catch((err) => {
-            this.setState({isLoading: false, error: err.message});
-        })
+        if(!this.state.isRobot){
+            login_request(username, password)
+                .then(r => {
+                    console.log(r);
+                    this.props.login();
+                }).catch((err) => {
+                this.setState({isLoading: false, error: err.message});
+            })
+        }else{
+            this.setState({isLoading: false, error: "please verify that you are not a robot"});
+        }
+
     }
 
     checkAuth(){
@@ -53,6 +67,17 @@ class loginPage extends Component {
                 });
     }
 
+    onLoadRecaptcha() {
+        if (this.captchaDemo) {
+            this.captchaDemo.reset();
+            this.setState({isRobot: true})
+        }
+    }
+    verifyCallback(recaptchaToken) {
+        // Here you will get the final recaptchaToken!!!
+        this.setState({isRobot: false})
+    }
+
     render() {
         if (this.state.isPageLoading) {
             return <><h1>loading...</h1><CircularProgress size="72px"/></>;
@@ -64,6 +89,15 @@ class loginPage extends Component {
                     <Grid item xs={12}>
                         {this.state.error && <Alert severity="error">{this.state.error}</Alert>}
                         <LoginForm isLoading={this.state.isLoading} isError={this.state.error} login={this.login}/>
+                        <ReCaptcha
+                            ref={(el) => {this.captchaDemo = el;}}
+                            size="normal"
+                            data-theme="dark"
+                            render="explicit"
+                            sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"
+                            onloadCallback={this.onLoadRecaptcha}
+                            verifyCallback={this.verifyCallback}
+                        />
                     </Grid>
                 </Grid>
                 }
