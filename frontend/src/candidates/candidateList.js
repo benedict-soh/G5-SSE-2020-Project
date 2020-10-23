@@ -29,12 +29,13 @@ const useStyles = makeStyles({
   },
 });
 
-export default function CandidateList() {
+export default function CandidateList(props) {
+  const id = props.match.params.id;
 	const [candidates, setCandidates] = useState([]);
   const classes = useStyles();
 
   useEffect(() => {
-    fetch('/candidates').then(response =>
+    fetch('/candidates?v_event_id='+id).then(response =>
       response.json().then(data => {
 				setCandidates(data);
       })
@@ -43,7 +44,13 @@ export default function CandidateList() {
 
 	return(
 			<div style={{ height: 300, width: '100%' }}>
-        <Link to={"/candidates/create/"}>
+        <h1>Candidates</h1>
+        <Link to={"/voting_events/"+id}>
+          <Button variant="contained">
+            Back to Event
+          </Button>
+        </Link>
+        <Link to={"/candidates/create/"+id}>
           <Button variant="contained" color="primary">
             Create New Candidate
           </Button>

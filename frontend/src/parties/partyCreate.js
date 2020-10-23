@@ -4,23 +4,21 @@ import {Route, withRouter, Switch, useParams} from "react-router-dom";
 import '../App.css';
 import PartyForm from "./partyForm"
 
-export default function PartyEdit(props) {
+export default function PartyCreate(props) {
   const id = props.match.params.id;
-  const [party, setParty] = useState('');
+  const [voting_event, setVotingEvent] = useState('');
 
   useEffect(() => {
     if(id) {
-      fetch('/parties/'+id).then(response =>
+      fetch('/voting-events/'+id).then(response =>
         response.json().then(data => {
-          console.log(data);
-          console.log("set party");
-          setParty(data);
+          setVotingEvent(data);
         })
       );
     }
   }, [])
 
   return (
-    <PartyForm party={party} party_id={id} />
+    <PartyForm voting_event={voting_event} />
   )
 }

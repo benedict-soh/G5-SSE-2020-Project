@@ -18,8 +18,9 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function CandidateForm({candidate, candidate_id}) {
+export default function CandidateForm({voting_event, candidate, candidate_id}) {
   const classes = useStyles();
+  const [id, setID] = useState("");
   const [voting_events, setVotingEvents] = useState([]);
   const [parties, setParties] = useState([]);
   const [candidate_name, setCandidateName] = useState("");
@@ -27,6 +28,10 @@ export default function CandidateForm({candidate, candidate_id}) {
   const [exclude, setExclude] = useState("");
   const [candidate_order, setCandidateOrder] = useState("");
 	const [v_event_id, setEventID] = useState("");
+  const [event_name, setEventName] = useState("");
+  const [event_year, setEventYear] = useState("");
+  const [vote_start, setVoteStart] = useState("");
+  const [vote_end, setVoteEnd] = useState("");
 	var CRUD = "Create";
 	if(candidate){
 		CRUD = "Update";
@@ -34,34 +39,50 @@ export default function CandidateForm({candidate, candidate_id}) {
 
 	useEffect(()=>{
 		if(candidate){
-			setCandidateName(candidate.candidate_name);
-			setEventID(candidate.v_event_id);
-      if(candidate.party_id != null) setPartyID(candidate.party_id);
-      else setPartyID(-1);
-      setExclude(candidate.exclude);
-      setCandidateOrder(candidate.candidate_order);
+      console.log("test2");
+      fetch('/parties?v_event_id='+candidate.v_event_id).then(response =>
+        response.json().then(data => {
+          setParties(data);
+          setCandidateName(candidate.candidate_name);
+          setID(candidate.v_event_id);
+          setEventID(candidate.v_event_id);
+          if(candidate.party_id != null) setPartyID(candidate.party_id);
+          else setPartyID(-1);
+          setExclude(candidate.exclude);
+          setCandidateOrder(candidate.candidate_order);
+        })
+      );
+      fetch('/voting-events/'+candidate.v_event_id).then(response =>
+        response.json().then(data => {
+          setEventName(data.event_name);
+          setEventYear(data.year);
+          setVoteStart(data.vote_start);
+          setVoteEnd(data.vote_end);
+        })
+      );
 		}
 	},[candidate])
 
   useEffect(() => {
-    fetch('/voting-events').then(response =>
-      response.json().then(data => {
-				setVotingEvents(data);
-      })
-    );
-  }, [])
-
-  useEffect(() => {
-    fetch('/parties').then(response =>
-      response.json().then(data => {
-				setParties(data);
-      })
-    );
-  }, [])
+    if(voting_event){
+      console.log("test");
+      setID(voting_event.id);
+      setEventID(voting_event.id);
+      setEventName(voting_event.event_name);
+      setEventYear(voting_event.year);
+      setVoteStart(voting_event.vote_start);
+      setVoteEnd(voting_event.vote_end);
+      fetch('/parties?v_event_id='+voting_event.id).then(response =>
+        response.json().then(data => {
+          setParties(data);
+        })
+      );
+    }
+  }, [voting_event])
 
 	const createCandidate = async () => {
 		console.log("Create");
-		const newCandidate = {candidate_name, v_event_id, party_id, exclude, candidate_order};
+		const newCandidate = {candidate_name, v_event_id: id, party_id, exclude, candidate_order};
     newCandidate.candidate_order = parseInt(newCandidate.candidate_order);
     if(party_id == -1) updateCandidate.party_id = null;
 		const response = await fetch("/candidates/create", {
@@ -73,15 +94,15 @@ export default function CandidateForm({candidate, candidate_id}) {
 		});
 		if(response.ok) {
 			console.log("Created party");
-			window.location.replace("/candidates");
+			window.location.replace("/voting_events/"+id+"/candidates");
 		} else {
-			console.log("Didnt create party");
+			console.log("Didnt create candidate");
 		}
 	}
 
 	const updateCandidate = async () => {
 		console.log("Update");
-		const updateCandidate = {candidate_name, v_event_id, party_id, exclude, candidate_order};
+		const updateCandidate = {candidate_name, v_event_id: id, party_id, exclude, candidate_order};
     updateCandidate.candidate_order = parseInt(updateCandidate.candidate_order);
     if(party_id == -1) updateCandidate.party_id = null;
 		const response = await fetch("/candidates/"+candidate_id+"/update", {
@@ -93,7 +114,7 @@ export default function CandidateForm({candidate, candidate_id}) {
 		});
 		if(response.status == "204") {
 			console.log("Updated candidate");
-			window.location.replace("/candidates");
+			window.location.replace("/voting_events/"+id+"/candidates");
 		} else {
 			console.log("Didnt update candidate");
 		}
@@ -123,28 +144,13 @@ export default function CandidateForm({candidate, candidate_id}) {
         id="v_event_id"
         select
         label="Voting Event"
-        value={v_event_id}
-        onChange={(event) => setEventID(event.target.value)}
+        value={id}
+        onChange={(event) => setID(event.target.value)}
         helperText="Associated voting event"
         variant="outlined"
+        inputProps={{ readOnly: true }}
       >
-      return (
-        {voting_events.map((row) => {
-          date = new Date(row.vote_start);
-          day = date.getDate();
-          mon = date.getMonth() + 1;
-          year = date.getFullYear();
-          vstart = day + "/" + mon + "/" + year;
-          date = new Date(row.vote_end);
-          day = date.getDate();
-          mon = date.getMonth() + 1;
-          year = date.getFullYear();
-          vend = day + "/" + mon + "/" + year;
-          return (
-            <MenuItem value={row.id}>{row.event_name} ({row.year}): {vstart} - {vend}</MenuItem>
-          )
-        })}
-      )
+      <MenuItem value={id}>{event_name} ({event_year}): {vstart} - {vend}</MenuItem>
       </TextField>
       <TextField
         required
@@ -200,7 +206,7 @@ export default function CandidateForm({candidate, candidate_id}) {
 			}>
         {CRUD} Candidate
       </Button>
-      <Link to={"/candidates/"}>
+      <Link to={"/voting_events/"+id+"/candidates/"}>
   			<Button variant="contained" color="secondary">
           Cancel
         </Button>

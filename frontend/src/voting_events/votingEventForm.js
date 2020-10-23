@@ -38,7 +38,6 @@ export default function VotingEventForm({voteEvent, event_id}) {
 	},[voteEvent])
 
 	const createEvent = async () => {
-		console.log("Create");
 		const newEvent = {event_name, year, vote_start, vote_end};
 		const response = await fetch("/voting-events/create", {
 			method: "POST",
@@ -56,7 +55,6 @@ export default function VotingEventForm({voteEvent, event_id}) {
 	}
 
 	const updateEvent = async () => {
-		console.log("Update");
 		const updateEvent = {event_name, year, vote_start, vote_end};
 		const response = await fetch("/voting-events/"+event_id+"/update", {
 			method: "PUT",

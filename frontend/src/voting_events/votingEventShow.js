@@ -34,8 +34,6 @@ export default function VotingEventShow(props) {
     if(id) {
       fetch('/voting-events/'+id).then(response =>
         response.json().then(data => {
-          // setEvents(data.events);
-
           // Format the data
           var date = new Date(data.vote_start);
           var day = ('0' + date.getDate()).slice(-2);
@@ -83,7 +81,7 @@ export default function VotingEventShow(props) {
   }, [])
 
 	return(
-		<div>
+		<div className={classes.root}>
     <h1>ID: {id}</h1>
 		<h1>{event_name}</h1>
     <h2>Year: {year}</h2>
@@ -101,6 +99,31 @@ export default function VotingEventShow(props) {
         <h3>[{excludeArr[row.exclude]}] {partiesDict[row.party_id]} - {row.candidate_name} (Ballot Order: {row.candidate_order})</h3>
       )
     })}
+    <div>
+    <Link to={"/parties/create/"+id}>
+      <Button variant="outlined" color="primary">
+        Create Party for Event
+      </Button>
+    </Link>
+    <Link to={"/voting_events/"+id+"/parties/"}>
+      <Button variant="outlined" color="secondary">
+        View All Parties for Event
+      </Button>
+    </Link>
+    </div>
+    <div>
+    <Link to={"/candidates/create/"+id}>
+      <Button variant="outlined" color="primary">
+        Create Candidate for Event
+      </Button>
+    </Link>
+    <Link to={"/voting_events/"+id+"/candidates/"}>
+      <Button variant="outlined" color="secondary">
+        View All Candidates for Event
+      </Button>
+    </Link>
+    </div>
+    <div>
     <Link to={"/voting_events/update/"+id}>
       <Button variant="contained" color="primary">
         Edit
@@ -126,6 +149,7 @@ export default function VotingEventShow(props) {
         Back to Voting Events
       </Button>
     </Link>
+    </div>
 		</div>
 		)
 }

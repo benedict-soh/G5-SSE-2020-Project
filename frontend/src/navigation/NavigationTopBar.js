@@ -134,7 +134,6 @@ function NavigationTopBar(props) {
                         <NavigationBarOption label={"For Voters"} to={"/vote"} />
                         <NavigationBarOption label={"For Parties"} to={"/parties"} />
                         <NavigationBarOption label={"Events"} to={"/voting_events"} />
-                        <NavigationBarOption label={"Candidates"} to={"/candidates"} />
                     </Tabs>
                     {props.isLoggedIn? <LogoutAvatar logout={props.logout}/> : <LoginAvatar/>}
                 </Toolbar>

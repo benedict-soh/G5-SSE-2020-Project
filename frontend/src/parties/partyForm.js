@@ -18,11 +18,16 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function PartyForm({party, party_id}) {
+export default function PartyForm({voting_event, party, party_id}) {
   const classes = useStyles();
+  const [id, setID] = useState("");
   const [voting_events, setVotingEvents] = useState([]);
 	const [party_name, setPartyName] = useState("");
-	const [v_event_id, setEventID] = useState("");
+  const [v_event_id, setEventID] = useState("");
+  const [event_name, setEventName] = useState("");
+  const [event_year, setEventYear] = useState("");
+  const [vote_start, setVoteStart] = useState("");
+  const [vote_end, setVoteEnd] = useState("");
 	var CRUD = "Create";
 	if(party){
 		CRUD = "Update";
@@ -30,22 +35,35 @@ export default function PartyForm({party, party_id}) {
 
 	useEffect(()=>{
 		if(party){
+      console.log(party);
 			setPartyName(party.party_name);
-			setEventID(party.v_event_id);
+      fetch('/voting-events/'+party.v_event_id).then(response =>
+        response.json().then(data => {
+  				setEventName(data.event_name);
+          setEventYear(data.year);
+          setVoteStart(data.vote_start);
+          setVoteEnd(data.vote_end);
+          setID(party.v_event_id);
+    			setEventID(party.v_event_id);
+        })
+      );
 		}
 	},[party])
 
   useEffect(() => {
-    fetch('/voting-events').then(response =>
-      response.json().then(data => {
-				setVotingEvents(data);
-      })
-    );
-  }, [])
+    if(voting_event){
+      setID(voting_event.id);
+      setEventID(voting_event.id);
+      setEventName(voting_event.event_name);
+      setEventYear(voting_event.year);
+      setVoteStart(voting_event.vote_start);
+      setVoteEnd(voting_event.vote_end);
+    }
+  }, [voting_event])
 
 	const createParty = async () => {
 		console.log("Create");
-		const newParty = {party_name, v_event_id};
+		const newParty = {party_name, v_event_id: id};
 		const response = await fetch("/parties/create", {
 			method: "POST",
 			headers: {
@@ -55,7 +73,7 @@ export default function PartyForm({party, party_id}) {
 		});
 		if(response.ok) {
 			console.log("Created party");
-			window.location.replace("/parties");
+			window.location.replace("/voting_events/"+id+"/parties");
 		} else {
 			console.log("Didnt create party");
 		}
@@ -63,7 +81,7 @@ export default function PartyForm({party, party_id}) {
 
 	const updateParty = async () => {
 		console.log("Update");
-		const updateParty = {party_name, v_event_id};
+		const updateParty = {party_name, v_event_id: id};
 		const response = await fetch("/parties/"+party_id+"/update", {
 			method: "PUT",
 			headers: {
@@ -73,7 +91,7 @@ export default function PartyForm({party, party_id}) {
 		});
 		if(response.status == "204") {
 			console.log("Updated party");
-			window.location.replace("/parties");
+			window.location.replace("/voting_events/"+id+"/parties");
 		} else {
 			console.log("Didnt update party");
 		}
@@ -85,6 +103,16 @@ export default function PartyForm({party, party_id}) {
   var year;
   var vstart;
   var vend;
+  date = new Date(vote_start);
+  day = date.getDate();
+  mon = date.getMonth() + 1;
+  year = date.getFullYear();
+  vstart = day + "/" + mon + "/" + year;
+  date = new Date(vote_end);
+  day = date.getDate();
+  mon = date.getMonth() + 1;
+  year = date.getFullYear();
+  vend = day + "/" + mon + "/" + year;
 	return(
 		<form className={classes.root} noValidate autoComplete="off">
 		<h1>{CRUD} Party</h1>
@@ -103,28 +131,13 @@ export default function PartyForm({party, party_id}) {
         id="v_event_id"
         select
         label="Voting Event"
-        value={v_event_id}
+        value={id}
         onChange={(event) => setEventID(event.target.value)}
         helperText="Associated voting event"
         variant="outlined"
+        inputProps={{ readOnly: true }}
       >
-      return (
-        {voting_events.map((row) => {
-          date = new Date(row.vote_start);
-          day = date.getDate();
-          mon = date.getMonth() + 1;
-          year = date.getFullYear();
-          vstart = day + "/" + mon + "/" + year;
-          date = new Date(row.vote_end);
-          day = date.getDate();
-          mon = date.getMonth() + 1;
-          year = date.getFullYear();
-          vend = day + "/" + mon + "/" + year;
-          return (
-            <MenuItem value={row.id}>{row.event_name} ({row.year}): {vstart} - {vend}</MenuItem>
-          )
-        })}
-      )
+      <MenuItem value={id}>{event_name} ({event_year}): {vstart} - {vend}</MenuItem>
       </TextField>
 		</div>
 		<div className={classes.root}>
@@ -136,7 +149,7 @@ export default function PartyForm({party, party_id}) {
 			}>
         {CRUD} Party
       </Button>
-      <Link to={"/parties/"}>
+      <Link to={"/voting_events/"+id+"/parties/"}>
   			<Button variant="contained" color="secondary">
           Cancel
         </Button>
