@@ -69,7 +69,20 @@ const useStyles = makeStyles((theme: Theme) =>
                 opacity: "0.8",
                 backgroundColor: primaryColor,
             },
-
+        },
+        logoutButton: {
+            textTransform: "none",
+            fontSize: "14px",
+            color: "white",
+            fontWeight: "bold",
+            opacity: 1,
+            backgroundColor: "red",
+            '&:hover': {
+                color: "white",
+                fontWeight: "bold",
+                opacity: "0.8",
+                backgroundColor: "red",
+            },
         },
 
     })
@@ -102,7 +115,7 @@ function LogoutAvatar(props) {
   return (
       <ThemeProvider theme={theme}>
           <div className={classes.leftTab}>
-              <Button className={classes.loginButton} onClick={() => logout(props)}>Log out</Button>
+              <Button className={classes.logoutButton} onClick={() => logout(props)}>Log out</Button>
           </div>
       </ThemeProvider>
   );

@@ -4,6 +4,7 @@ const BaseUrl = "http://127.0.0.1:5000";
 const loginAPI = "/auth/login"; // POST
 const logoutAPI= "/auth/logout"; // [POST, GET]
 const authTestAPI= "/auth/test"; // GET
+const getRoleAPI = "/auth/get-role"; // GET
 
 
 // post API request for login
@@ -14,18 +15,25 @@ export async function login_request(username, password) {
         {headers:{"Content-Type": "application/json"}}
         );
     console.log(response);
-    return response.data
+    return response.data;
 }
 
 // post API request for logout
 export async function logout_request() {
     const response = await axios.get(logoutAPI);
-    return response.status
+    return response.status;
 }
 
 
 // post API request for logout
-export async function authTest_request(token) {
+export async function authTest_request() {
     const response = await axios.get(authTestAPI);
-    return response.status
+    return response;
+}
+
+// get API request for authorisation
+export async function get_role() {
+    const response = await axios.get(getRoleAPI);
+    console.log(response)
+    return response;
 }

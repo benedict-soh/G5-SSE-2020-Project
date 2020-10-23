@@ -55,7 +55,7 @@ class loginPage extends Component {
 
     render() {
         if (this.state.isPageLoading) {
-            return null;
+            return <><h1>loading...</h1><CircularProgress size="72px"/></>;
         }
         return (
             <>
