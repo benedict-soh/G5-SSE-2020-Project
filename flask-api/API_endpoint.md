@@ -117,6 +117,8 @@ Returns 201 upon success with body:
 }
 ```
 
+`vote_start` and `vote_end` should both be in UTC time.
+
 If the date format needs to be changed, ping me (Ben) on Discord.
 
 ### Get by ID
@@ -259,6 +261,8 @@ Requires a JSON object with the following fields:
     "vote_end" : "a date in the format of 'YYYY-MM-DD'"
 }
 ```
+
+`vote_start` and `vote_end` should both be in UTC time.
 
 Returns 204 upon success.
 
