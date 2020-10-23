@@ -151,6 +151,24 @@ Returns 200 with a **list** of JSON objects such as:
 ]
 ```
 
+### Get Events Not Voted In
+
+`/voting-events/open` methods=['GET']
+
+Returns 200 with a **list** of Voting Event IDs such as:
+```json
+{
+  "v_event_id_list": "list of IDs"
+}
+```
+
+Example:
+```json
+{
+  "v_event_id_list": [1, 2, 3, 4]
+}
+```
+
 ### Tally
 
 `/voting-events/{voting-event-ID}/tally` methods=['GET']

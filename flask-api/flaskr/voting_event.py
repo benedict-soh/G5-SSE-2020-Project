@@ -84,6 +84,45 @@ def getList():
     resp.headers['Content-Type'] = 'application/json'
     return resp
 
+@bp.route('/open', methods=['GET'])
+@jwt_required
+def getListByUserId():
+    # Check Authorisation
+    token = get_jwt_claims()
+    user_id = token['id']
+    if token['user_type'] != 'voter':
+        abort(403, 'Forbidden')
+
+    print(user_id)
+
+    db = get_db()
+    cursor = db.cursor()
+    v_events = cursor.execute(
+        'SELECT * FROM voting_event'
+    ).fetchall()
+    event_id_list = list(map(lambda v_event: v_event['id'], v_events))
+
+    status_list = cursor.execute(
+        'SELECT * FROM vote_status WHERE user_id = ?', (user_id,)
+    ).fetchall()
+    voted_event_id_list = list(map(lambda v_status: v_status['v_event_id'], status_list))
+
+    data = []
+    for id in event_id_list:
+        data.append(id)
+    event_id_list = data
+
+    data = []
+    for id in voted_event_id_list:
+        data.append(id)
+    voted_event_id_list = data
+
+    open_events = list(set(event_id_list).symmetric_difference(set(voted_event_id_list)))
+
+    resp = make_response({"v_event_id_list": open_events}, 200)
+    resp.headers['Content-Type'] = 'application/json'
+    return resp
+
 @bp.route('/<int:voting_event_id>/tally', methods=['GET'])
 @jwt_required
 def tally(voting_event_id):
@@ -91,7 +130,7 @@ def tally(voting_event_id):
     token = get_jwt_claims()
     if token['user_type'] != 'commissioner':
         abort(403, 'Forbidden')
-        
+
     db = get_db()
     cursor = db.cursor()
     votes = cursor.execute(
