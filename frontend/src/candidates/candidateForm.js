@@ -39,7 +39,6 @@ export default function CandidateForm({voting_event, candidate, candidate_id}) {
 
 	useEffect(()=>{
 		if(candidate){
-      console.log("test2");
       fetch('/parties?v_event_id='+candidate.v_event_id).then(response =>
         response.json().then(data => {
           setParties(data);
@@ -65,7 +64,6 @@ export default function CandidateForm({voting_event, candidate, candidate_id}) {
 
   useEffect(() => {
     if(voting_event){
-      console.log("test");
       setID(voting_event.id);
       setEventID(voting_event.id);
       setEventName(voting_event.event_name);
@@ -81,10 +79,8 @@ export default function CandidateForm({voting_event, candidate, candidate_id}) {
   }, [voting_event])
 
 	const createCandidate = async () => {
-		console.log("Create");
-		const newCandidate = {candidate_name, v_event_id: id, party_id, exclude, candidate_order};
-    newCandidate.candidate_order = parseInt(newCandidate.candidate_order);
-    if(party_id == -1) updateCandidate.party_id = null;
+		const newCandidate = {candidate_name, v_event_id: id, party_id, exclude, candidate_order: parseInt(candidate_order)};
+    if(party_id == -1) delete newCandidate['party_id'];
 		const response = await fetch("/candidates/create", {
 			method: "POST",
 			headers: {
@@ -101,10 +97,8 @@ export default function CandidateForm({voting_event, candidate, candidate_id}) {
 	}
 
 	const updateCandidate = async () => {
-		console.log("Update");
-		const updateCandidate = {candidate_name, v_event_id: id, party_id, exclude, candidate_order};
-    updateCandidate.candidate_order = parseInt(updateCandidate.candidate_order);
-    if(party_id == -1) updateCandidate.party_id = null;
+		var updateCandidate = {candidate_name, v_event_id: id, party_id, exclude, candidate_order: parseInt(candidate_order)};
+    if(party_id == -1) delete updateCandidate['party_id'];
 		const response = await fetch("/candidates/"+candidate_id+"/update", {
 			method: "PUT",
 			headers: {
