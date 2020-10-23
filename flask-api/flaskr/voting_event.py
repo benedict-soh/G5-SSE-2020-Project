@@ -107,16 +107,6 @@ def getListByUserId():
     ).fetchall()
     voted_event_id_list = list(map(lambda v_status: v_status['v_event_id'], status_list))
 
-    data = []
-    for id in event_id_list:
-        data.append(id)
-    event_id_list = data
-
-    data = []
-    for id in voted_event_id_list:
-        data.append(id)
-    voted_event_id_list = data
-
     open_events = list(set(event_id_list).symmetric_difference(set(voted_event_id_list)))
 
     resp = make_response({"v_event_id_list": open_events}, 200)
