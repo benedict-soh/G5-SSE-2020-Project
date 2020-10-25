@@ -19,6 +19,7 @@ import loginPage from "./login/login";
 import {authTest_request} from "./utils/API";
 import connect from "react-redux/lib/connect/connect";
 import {authActions} from "./utils/store";
+import { loadReCaptcha } from 'react-recaptcha-google'
 
 class App extends Component {
     constructor(props){
@@ -33,6 +34,10 @@ class App extends Component {
         if (this.checkAuth() === true){
             this.setState({isLoggedIn: true})
         }
+    }
+
+    componentDidMount() {
+        loadReCaptcha();
     }
 
     //check authentication
