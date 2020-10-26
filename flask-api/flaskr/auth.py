@@ -5,7 +5,7 @@ from flask import (
 )
 
 from flask_jwt_extended import (
-    jwt_required, create_access_token,
+    jwt_required, create_access_token, get_jwt_claims,
     get_jwt_identity, set_access_cookies, unset_jwt_cookies
 )
 
@@ -85,6 +85,13 @@ def logout():
     resp = jsonify({'logout': True})
     unset_jwt_cookies(resp)
     return resp, 200
+
+
+@bp.route('/get-role', methods = ['GET'])
+@jwt_required
+def get_role():
+    claims = get_jwt_claims()
+    return claims['user_type']
 
 
 @bp.route('/test', methods=['POST', 'GET'])

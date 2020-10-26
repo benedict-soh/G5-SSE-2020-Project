@@ -16,7 +16,7 @@ Requires a JSON object with the following fields:
 ```json
 {
     "username" : "some username, must be unique",
-    "password" : "some string, not limitation/restrictions yet. Is salt hased",
+    "password" : "some string, not limitation/restrictions yet. Is salt hashed",
     "full_name" : "some name",
     "user_type" : "voter/commissioner"
 }
@@ -46,12 +46,53 @@ Will also return a non-HttpOnly Cookie named `csrf_access_token`, and the fronte
 
 Will strip away both of the provided Cookies.
 
+#### Get role
+
+`/auth/get-role` methods=['GET']
+
+Given a user has a valid JWT token, return the user's role as a string the body.
+
+This is intended for authorisation checks on statically rendered page.
 
 #### Test endpoint (will be around until we implement some real endpoints)
 
 `/auth/test` methods=['POST', 'GET']
 
 Will require a valid JWT Cookie and the CSRF header (See login for CSRF example).
+
+## Voting Endpoints:
+
+### Create
+
+`/votes/create` methods=['POST']
+
+Requires a JSON object with the following fields:
+```json
+{
+    "v_event_id": "a number",
+    "above": [
+      {
+        "party_id": "a number",
+        "number": "a number"
+      }
+    ],
+    "below": [
+      {
+        "candidate_id": "a number",
+        "number": "a number"
+      }
+    ]
+}
+```
+
+The `above` **OR** `below` fields _must_ be filled.
+If the `above` field is filled, it **must contain 6 objects**.
+If the `below` field is filled, it **must contain 12 objects**.
+`v_event_id` must be a valid event ID.
+
+Returns 201 upon success with no body.
+
+If the date format needs to be changed, ping me (Ben) on Discord.
 
 ## Voting Event Endpoints:
 
@@ -69,7 +110,14 @@ Requires a JSON object with the following fields:
 }
 ```
 
-Returns 204 upon success.
+Returns 201 upon success with body:
+```json
+{
+  "id": "a number"
+}
+```
+
+`vote_start` and `vote_end` should both be in UTC time.
 
 If the date format needs to be changed, ping me (Ben) on Discord.
 
@@ -105,6 +153,101 @@ Returns 200 with a **list** of JSON objects such as:
 ]
 ```
 
+### Get Events Not Voted In
+
+`/voting-events/open` methods=['GET']
+
+Returns 200 with a **list** of Voting Event IDs such as:
+```json
+{
+  "v_event_id_list": "list of IDs"
+}
+```
+
+Example:
+```json
+{
+  "v_event_id_list": [1, 2, 3, 4]
+}
+```
+
+### Tally
+
+`/voting-events/{voting-event-ID}/tally` methods=['GET']
+
+Returns 200 with a JSON object:
+```json
+{
+    "above": [
+      {
+        "party_id": "a number",
+        "votes": [
+          {"a number in 1..{No. of Parties}": "a number"},
+          {"a number in 1..{No. of Parties}": "a number"},
+          ...
+        ]
+      },
+      ...
+    ],
+    "below": [
+      {
+        "candidate_id": "a number",
+        "votes": [
+          {"a number in 1..{No. of Candidates}": "a number"},
+          {"a number in 1..{No. of Candidates}": "a number"},
+          ...
+        ]
+      },
+      ...
+    ],
+    "total_above": "a number",
+    "total_below": "a number",
+    "total": "a number"
+}
+```
+`total` is the sum of `total_above` and `total_below`.
+
+Example Response:
+```json
+{
+    "above": [
+      {
+        "party_id": 1,
+        "votes": [
+          {"1": 2},
+          {"2": 0}
+        ]
+      },
+      {
+        "party_id": 2,
+        "votes": [
+          {"1": 0},
+          {"2": 2}
+        ]
+      }
+    ],
+    "below": [
+      {
+        "candidate_id": 1,
+        "votes": [
+          {"1": 0},
+          {"2": 1}
+        ]
+      },
+      {
+        "candidate_id": 2,
+        "votes": [
+          {"1": 1},
+          {"2": 0}
+        ]
+      }
+    ],
+    "total_above": 2,
+    "total_below": 1,
+    "total": 3
+}
+```
+
 ### Update
 
 `/voting-events/{voting-event-ID}/update` methods=['PUT']
@@ -118,6 +261,8 @@ Requires a JSON object with the following fields:
     "vote_end" : "a date in the format of 'YYYY-MM-DD'"
 }
 ```
+
+`vote_start` and `vote_end` should both be in UTC time.
 
 Returns 204 upon success.
 
@@ -141,7 +286,12 @@ Requires a JSON object with the following fields:
 }
 ```
 
-Returns 204 upon success.
+Returns 201 upon success with body:
+```json
+{
+  "id": "a number"
+}
+```
 
 ### Get by ID
 
@@ -224,7 +374,12 @@ Optional fields of `party_id` and `candidate_order` can be provided if the candi
 }
 ```
 
-Returns 204 upon success.
+Returns 201 upon success with body:
+```json
+{
+  "id": "a number"
+}
+```
 
 ### Get by ID
 
