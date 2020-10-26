@@ -96,7 +96,7 @@ export default function CandidateRows({candidates }){
           		});
           		if(response.ok) {
           			console.log("Deleted candidate");
-          			window.location.replace("/candidates");
+          			window.location.replace("/voting_events/"+row.v_event_id+"/candidates");
           		} else {
           			console.log("Didnt delete candidate");
           		}

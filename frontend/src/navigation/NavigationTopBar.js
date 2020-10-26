@@ -149,9 +149,7 @@ function NavigationTopBar(props) {
                         <>
                             <NavigationBarOption label={"Home"} to={"/"} />
                             <NavigationBarOption label={"For Voters"} to={"/vote"} />
-                            <NavigationBarOption label={"For Parties"} to={"/parties"} />
-                            <NavigationBarOption label={"Events"} to={"/voting_events"} />
-                            <NavigationBarOption label={"Candidates"} to={"/candidates"} />
+                            <NavigationBarOption label={"For Commissioners"} to={"/voting_events"} />
                         </>
                         :
                         <NavigationBarOption label={"Home"} to={"/"} />

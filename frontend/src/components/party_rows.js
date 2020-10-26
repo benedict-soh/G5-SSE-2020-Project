@@ -78,7 +78,7 @@ export default function PartyRows({parties }){
           		});
           		if(response.ok) {
           			console.log("Deleted party");
-          			window.location.replace("/parties");
+          			window.location.replace("/voting_events/"+row.v_event_id+"/parties");
           		} else {
           			console.log("Didnt delete party");
           		}

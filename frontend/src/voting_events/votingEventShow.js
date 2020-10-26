@@ -125,9 +125,11 @@ export default function VotingEventShow(props) {
     })}
     <h3><u>Associated Candidates</u></h3>
     {candidates.map((row) => {
+      var ballOrder = row.candidate_order;
+      if(row.candidate_order == null) ballOrder = "N/A";
       return (
         <div>
-        <h3>[{excludeArr[row.exclude]}] {partiesDict[row.party_id]} - {row.candidate_name} (Ballot Order: {row.candidate_order})</h3>
+        <h3>[{excludeArr[row.exclude]}] {partiesDict[row.party_id]} - {row.candidate_name} (Ballot Order: {ballOrder})</h3>
         <ul>
         {candidateTally[row.id].map((voteRow) => {
           var pref = Object.entries(voteRow)[0][0];

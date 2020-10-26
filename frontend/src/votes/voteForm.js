@@ -113,9 +113,10 @@ export default function PartyForm({voting_event, party, party_id}) {
           var belowSetup = {};
           var totalCand = 0;
           for(var i=0;i<data.length;i++){
-            // console.log(data[i].party_id);
             // Map candidates to an array for sorting later
             if(!data[i].exclude) {
+              // Set to high number to put at bottom of list if not set
+              if(data[i].candidate_order == null) data[i].candidate_order = 999;
               candidatesArr[data[i].party_id].push(data[i]);
               if(data[i].party_id != null) candidatesArr[data[i].party_id].sort(orderCompare);
               belowSetup[data[i].id] = -1;
@@ -141,7 +142,7 @@ export default function PartyForm({voting_event, party, party_id}) {
         submitAbove.push({"party_id": parties[i].id, "number": above[parties[i].id]});
       }
       if(candidates[parties[i].id]) {
-        console.log(parties[i].id);
+        // console.log(parties[i].id);
         for(var j=0;j<candidates[parties[i].id].length;j++){
           if(below[candidates[parties[i].id][j].id] != -1) {
             submitBelow.push({"candidate_id": candidates[parties[i].id][j].id, "number": below[candidates[parties[i].id][j].id]});
@@ -151,14 +152,14 @@ export default function PartyForm({voting_event, party, party_id}) {
     }
     // Handle null party case
     if(candidates[null]) {
-      for(var j=0;j<candidates[null];j++){
+      for(var j=0;j<candidates[null].length;j++){
         if(below[candidates[null][j].id] != -1) {
           submitBelow.push({"candidate_id": candidates[null][j].id, "number": below[candidates[null][j].id]});
         }
       }
     }
     const newVote = {v_event_id: id, vote_data: {above: submitAbove, below: submitBelow}};
-    console.log(JSON.stringify(newVote));
+    // console.log(JSON.stringify(newVote));
 		const response = await fetch("/votes/create", {
 			method: "POST",
 			headers: {
