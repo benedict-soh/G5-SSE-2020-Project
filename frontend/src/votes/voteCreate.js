@@ -3,8 +3,9 @@ import NavigationTopBar from '../navigation/NavigationTopBar'
 import {Route, withRouter, Switch, useParams} from "react-router-dom";
 import '../App.css';
 import VoteForm from "./voteForm"
+import {withAuthorisation} from "../components/AuthWrapper"
 
-export default function VoteCreate(props) {
+function VoteCreate(props) {
   const id = props.match.params.id;
   const [voting_event, setVotingEvent] = useState('');
 
@@ -22,3 +23,5 @@ export default function VoteCreate(props) {
     <VoteForm voting_event={voting_event} />
   )
 }
+
+export default withAuthorisation(VoteCreate, "voter")

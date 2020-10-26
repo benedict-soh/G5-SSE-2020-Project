@@ -3,8 +3,9 @@ import NavigationTopBar from '../navigation/NavigationTopBar'
 import {Route, withRouter, Switch, useParams} from "react-router-dom";
 import '../App.css';
 import PartyForm from "./partyForm"
+import {withAuthorisation} from "../components/AuthWrapper"
 
-export default function PartyCreate(props) {
+function PartyCreate(props) {
   const id = props.match.params.id;
   const [voting_event, setVotingEvent] = useState('');
 
@@ -22,3 +23,5 @@ export default function PartyCreate(props) {
     <PartyForm voting_event={voting_event} />
   )
 }
+
+export default withAuthorisation(PartyCreate, "commissioner")

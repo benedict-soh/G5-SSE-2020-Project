@@ -93,6 +93,7 @@ const mapDispatchToProps = (dispatch) => ({
 
 const mapStateToProps = (state) => ({
     isLoggedIn: state.authReducer.isLoggedIn,
+    authorisation: state.authReducer.authorisation,
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(withRouter(App))

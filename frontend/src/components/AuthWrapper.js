@@ -72,12 +72,13 @@ export function withAuthorisation(WrappedComponent, role) {
     const mapDispatchToProps = (dispatch) => ({
         logout: () => dispatch(authActions.logout()),
         login: () => dispatch(authActions.login()),
+        setAuth: (auth) => dispatch(authActions.setAuth(auth)),
     });
 
     const mapStateToProps = (state) => ({
         isLoggedIn: state.authReducer.isLoggedIn,
+        authorisation: state.authReducer.authorisation,
     });
 
     return connect(mapStateToProps, mapDispatchToProps)(AuthWrapper);
 }
-

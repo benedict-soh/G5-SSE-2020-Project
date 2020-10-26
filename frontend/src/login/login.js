@@ -77,6 +77,7 @@ class loginPage extends Component {
             }).then(r => {
             if (r && r.status && r.status === 200) {
                 this.setState({authorisation: r.data, isloadingRedirect: false});
+                this.props.setAuth(r.data);
             }
         });
 
@@ -296,10 +297,12 @@ function LoginForm(props) {
 const mapDispatchToProps = (dispatch) => ({
     logout: () => dispatch(authActions.logout()),
     login: () => dispatch(authActions.login()),
+    setAuth: (auth) => dispatch(authActions.setAuth(auth)),
 });
 
 const mapStateToProps = (state) => ({
     isLoggedIn: state.authReducer.isLoggedIn,
+    authorisation: state.authReducer.authorisation,
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(loginPage)

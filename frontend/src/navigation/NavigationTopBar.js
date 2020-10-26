@@ -4,7 +4,7 @@ import Button from '@material-ui/core/Button';
 import { NavLink } from "react-router-dom";
 import { makeStyles, ThemeProvider } from "@material-ui/core/styles";
 import connect from "react-redux/lib/connect/connect";
-import {logout_request} from "../utils/API";
+import {logout_request, get_role} from "../utils/API";
 import {authActions} from "../utils/store";
 
 const theme = createMuiTheme({
@@ -137,6 +137,7 @@ function logout(props){
 function NavigationTopBar(props) {
     const classes = useStyles();
     const isLoggedIn = props.isLoggedIn;
+    const authorisation = props.authorisation;
     return (
         <AppBar position="static" className={classes.root}>
             <div className={classes.navWrapper}>
@@ -148,8 +149,12 @@ function NavigationTopBar(props) {
                         {isLoggedIn?
                         <>
                             <NavigationBarOption label={"Home"} to={"/"} />
-                            <NavigationBarOption label={"For Voters"} to={"/vote"} />
-                            <NavigationBarOption label={"For Commissioners"} to={"/voting_events"} />
+                            {authorisation == "voter" &&
+                              <NavigationBarOption label={"Events"} to={"/vote"} />
+                            }
+                            {authorisation == "commissioner" &&
+                              <NavigationBarOption label={"Events"} to={"/voting_events"} />
+                            }
                         </>
                         :
                         <NavigationBarOption label={"Home"} to={"/"} />
@@ -168,6 +173,7 @@ const mapDispatchToProps = (dispatch) => ({
 
 const mapStateToProps = (state) => ({
     isLoggedIn: state.authReducer.isLoggedIn,
+    authorisation: state.authReducer.authorisation,
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(NavigationTopBar);

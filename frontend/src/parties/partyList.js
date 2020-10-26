@@ -12,6 +12,7 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import '../App.css';
+import {withAuthorisation} from "../components/AuthWrapper"
 
 const StyledTableCell = withStyles((theme) => ({
   head: {
@@ -29,7 +30,7 @@ const useStyles = makeStyles({
   },
 });
 
-export default function PartyList(props) {
+function PartyList(props) {
   const id = props.match.params.id;
 	const [parties, setParties] = useState([]);
   const classes = useStyles();
@@ -72,3 +73,5 @@ export default function PartyList(props) {
     </div>
 		);
 }
+
+export default withAuthorisation(PartyList, "commissioner")

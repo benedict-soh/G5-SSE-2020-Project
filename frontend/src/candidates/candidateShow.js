@@ -4,6 +4,7 @@ import {Route, withRouter, Switch, Link} from "react-router-dom";
 import { TextField,Button } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import '../App.css';
+import {withAuthorisation} from "../components/AuthWrapper"
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -19,7 +20,7 @@ const useStyles = makeStyles((theme) => ({
 
 const excludeArr = {0: "Included", 1: "Excluded"};
 
-export default function CandidateShow(props) {
+function CandidateShow(props) {
   const id = props.match.params.id;
 	const classes = useStyles();
   const [candidate_name, setCandidateName] = useState("");
@@ -112,3 +113,5 @@ export default function CandidateShow(props) {
 		</div>
 		)
 }
+
+export default withAuthorisation(CandidateShow, "commissioner")

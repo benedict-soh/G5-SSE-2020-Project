@@ -3,8 +3,9 @@ import NavigationTopBar from '../navigation/NavigationTopBar'
 import {Route, withRouter, Switch, useParams} from "react-router-dom";
 import '../App.css';
 import CandidateForm from "./candidateForm"
+import {withAuthorisation} from "../components/AuthWrapper"
 
-export default function CandidateEdit(props) {
+function CandidateEdit(props) {
   const id = props.match.params.id;
   const [candidate, setCandidate] = useState('');
 
@@ -23,3 +24,5 @@ export default function CandidateEdit(props) {
     <CandidateForm candidate={candidate} candidate_id={id} />
   )
 }
+
+export default withAuthorisation(CandidateEdit, "commissioner")

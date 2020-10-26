@@ -12,6 +12,7 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import '../App.css';
+import {withAuthorisation} from "../components/AuthWrapper"
 
 const StyledTableCell = withStyles((theme) => ({
   head: {
@@ -29,7 +30,7 @@ const useStyles = makeStyles({
   },
 });
 
-export default function VoteList(props) {
+function VoteList(props) {
   const [voting_events, setVotingEvents] = useState([]);
   const [allowed_events, setAllowedEvents] = useState([]);
   const classes = useStyles();
@@ -70,3 +71,5 @@ export default function VoteList(props) {
     </div>
 		);
 }
+
+export default withAuthorisation(VoteList, "voter")
