@@ -47,16 +47,37 @@ function orderCompare( a, b ) {
 export default function PartyForm({voting_event, party, party_id}) {
   const classes = useStyles();
   const [id, setID] = useState("");
+  const [above, setAbove] = useState([]);
+  const [below, setBelow] = useState([]);
   const [voting_events, setVotingEvents] = useState([]);
   const [parties, setParties] = useState([]);
   const [partiesDict, setPartiesDict] = useState([]);
+  const [total_parties, setTotalParties] = useState("");
   const [candidates, setCandidates] = useState([]);
+  const [total_candidates, setTotalCandidates] = useState("");
 	const [party_name, setPartyName] = useState("");
   const [v_event_id, setEventID] = useState("");
   const [event_name, setEventName] = useState("");
   const [event_year, setEventYear] = useState("");
   const [vote_start, setVoteStart] = useState("");
   const [vote_end, setVoteEnd] = useState("");
+
+  // very inefficient way of handling these
+  function handleAboveChange(e) {
+    var partyId = parseInt((e.target.id).split("party-")[1]);
+    var aboveNew = above;
+    aboveNew[partyId] = parseInt(e.target.value);
+    // console.log(aboveNew);
+    setAbove(aboveNew);
+  }
+
+  function handleBelowChange(e) {
+    var candidateId = parseInt((e.target.id).split("candidate-")[1]);
+    var belowNew = below;
+    belowNew[candidateId] = parseInt(e.target.value);
+    // console.log(belowNew);
+    setBelow(belowNew);
+  }
 
   useEffect(() => {
     if(voting_event){
@@ -71,22 +92,39 @@ export default function PartyForm({voting_event, party, party_id}) {
       fetch('/parties?v_event_id='+voting_event.id).then(response =>
         response.json().then(data => {
           setParties(data);
+          setTotalParties(data.length);
+          // Create a parties dictionary for reference later
           var partyArr = {};
+          var aboveSetup = {};
           partyArr[null] = "No Party";
           for(var i=0;i<data.length;i++){
             partyArr[data[i].id] = data[i].party_name;
             candidatesArr[data[i].id] = [];
+            aboveSetup[data[i].id] = -1;
+            // aboveSetup.push({"party_id": data[i].id, "number": -1});
           }
+          // console.log(JSON.stringify(aboveSetup));
+          setAbove(aboveSetup);
           setPartiesDict(partyArr);
           return fetch('/candidates?v_event_id='+voting_event.id);
         }).then(function(response) {
           return response.json();
         }).then(function(data) {
+          var belowSetup = {};
+          var totalCand = 0;
           for(var i=0;i<data.length;i++){
             // console.log(data[i].party_id);
-            candidatesArr[data[i].party_id].push(data[i]);
-            if(data[i].party_id != null) candidatesArr[data[i].party_id].sort(orderCompare);
+            // Map candidates to an array for sorting later
+            if(!data[i].exclude) {
+              candidatesArr[data[i].party_id].push(data[i]);
+              if(data[i].party_id != null) candidatesArr[data[i].party_id].sort(orderCompare);
+              belowSetup[data[i].id] = -1;
+              // belowSetup.push({"candidate_id": data[i].id, "number": -1});
+            }
           }
+          // console.log(JSON.stringify(belowSetup));
+          setBelow(belowSetup);
+          setTotalCandidates(totalCand);
           setCandidates(candidatesArr);
         })
       );
@@ -95,9 +133,31 @@ export default function PartyForm({voting_event, party, party_id}) {
 
 	const createVote = async () => {
 		console.log("Create");
-    var above = [];
-    var below = [];
-		const newVote = {v_event_id: id, above: above, below: below};
+    var submitAbove = [];
+    var submitBelow = [];
+    // Process array to put into submit above and below
+    for(var i=0;i<parties.length;i++) {
+      if(above[parties[i].id] != -1) {
+        submitAbove.push({"party_id": parties[i].id, "number": above[parties[i].id]});
+      }
+      if(candidates[parties[i].id]) {
+        console.log(parties[i].id);
+        for(var j=0;j<candidates[parties[i].id].length;j++){
+          if(below[candidates[parties[i].id][j].id] != -1) {
+            submitBelow.push({"candidate_id": candidates[parties[i].id][j].id, "number": below[candidates[parties[i].id][j].id]});
+          }
+        }
+      }
+    }
+    // Handle null party case
+    if(candidates[null]) {
+      for(var j=0;j<candidates[null];j++){
+        if(below[candidates[null][j].id] != -1) {
+          submitBelow.push({"candidate_id": candidates[null][j].id, "number": below[candidates[null][j].id]});
+        }
+      }
+    }
+    const newVote = {v_event_id: id, above: submitAbove, below: submitBelow};
 		const response = await fetch("/votes/create", {
 			method: "POST",
 			headers: {
@@ -112,6 +172,7 @@ export default function PartyForm({voting_event, party, party_id}) {
 			console.log("Didnt create vote");
 		}
 	}
+
   var date;
   var day;
   var mon;
@@ -147,7 +208,7 @@ export default function PartyForm({voting_event, party, party_id}) {
         {parties.map((row) => {
           return (
             <Grid item xs spacing={3}>
-              <TextField id={"party-"+row.id} label={row.party_name} type="number" variant="filled"/>
+              <TextField id={"party-"+row.id} label={row.party_name} type="number" inputProps={{ min: 1 }} variant="filled" onChange={handleAboveChange}/>
             </Grid>
           )
         })}
@@ -170,9 +231,9 @@ export default function PartyForm({voting_event, party, party_id}) {
               <Grid item xs spacing={3}>
               <h4>{partiesDict[party.id]}</h4>
                 {candidates[party.id].map((row) => {
-                  console.log(row);
+                  // console.log(row);
                   return (
-                      <TextField id={"candidate-"+row.id} label={row.candidate_name} type="number" variant="filled"/>
+                      <TextField id={"candidate-"+row.id} label={row.candidate_name} type="number" inputProps={{ min: 1 }} variant="filled" onChange={handleBelowChange}/>
                   )
                 })}
               </Grid>
@@ -180,7 +241,6 @@ export default function PartyForm({voting_event, party, party_id}) {
           } else {
             return (
               <Grid item xs spacing={3}>
-              <h2>Test</h2>
               </Grid>
             )
           }
@@ -189,9 +249,9 @@ export default function PartyForm({voting_event, party, party_id}) {
           <Grid item xs spacing={3}>
           <h4>No Party</h4>
           {candidates[null].map((row) => {
-            console.log(row);
+            // console.log(row);
             return (
-              <TextField id={"candidate-"+row.id} label={row.candidate_name} type="number" variant="filled"/>
+              <TextField id={"candidate-"+row.id} label={row.candidate_name} type="number" inputProps={{ min: 1}} variant="filled" onChange={handleBelowChange}/>
             )
           })}
           </Grid>
