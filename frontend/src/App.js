@@ -20,6 +20,7 @@ import {authTest_request} from "./utils/API";
 import connect from "react-redux/lib/connect/connect";
 import {authActions} from "./utils/store";
 import { loadReCaptcha } from 'react-recaptcha-google'
+import LogoutPage from "./login/logout";
 
 class App extends Component {
     constructor(props){
@@ -45,7 +46,7 @@ class App extends Component {
         authTest_request()
             .then(
                 (r) => {
-                    if (r === 200){
+                    if (r && r.status && r.status === 200){
                         this.props.login();
                     }
                 }).catch((err) => {
@@ -57,7 +58,7 @@ class App extends Component {
     render() {
         return (
             <div className="App">
-                <NavigationTopBar/>
+                <NavigationTopBar {...this.props}/>
                     <Switch>
                         {/* add new routes inside this switch */}
                         <Route strict path="/vote" component={voterRoutes}/>
@@ -74,14 +75,8 @@ class App extends Component {
                         <Route path="/candidates/update/:id" component={CandidateEdit}/>
                         <Route path="/candidates/:id" component={CandidateShow}/>
                         <Route strict path="/login" component={loginPage}/>
+                        <Route strict path="/logout" component={LogoutPage}/>
                     </Switch>
-                    <a
-                        className="App-link"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                    >
-                        Login to Vote
-                    </a>
             </div>
         );
     }
