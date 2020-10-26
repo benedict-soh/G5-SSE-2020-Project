@@ -4,6 +4,7 @@ import {Route, withRouter, Switch, Link} from "react-router-dom";
 import { TextField,Button } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import '../App.css';
+import {withAuthorisation} from "../components/AuthWrapper"
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -17,7 +18,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function VotingEventForm({voteEvent, event_id}) {
+function VotingEventForm({voteEvent, event_id}) {
 	const classes = useStyles();
 	const [event_name, setEventName] = useState("");
 	const [year, setEventYear] = useState("");
@@ -141,3 +142,5 @@ export default function VotingEventForm({voteEvent, event_id}) {
 		</form>
 		)
 }
+
+export default withAuthorisation(VotingEventForm, "commissioner")

@@ -4,6 +4,7 @@ import {Route, withRouter, Switch, Link} from "react-router-dom";
 import { TextField,Button } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import '../App.css';
+import {withAuthorisation} from "../components/AuthWrapper"
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -19,7 +20,7 @@ const useStyles = makeStyles((theme) => ({
 
 const excludeArr = {0: "Included", 1: "Excluded"};
 
-export default function CandidateShow(props) {
+function CandidateShow(props) {
   const id = props.match.params.id;
 	const classes = useStyles();
   const [candidate_name, setCandidateName] = useState("");
@@ -40,6 +41,7 @@ export default function CandidateShow(props) {
           setCandidateName(data.candidate_name);
           setExclude(excludeArr[data.exclude]);
           setCandidateOrder(data.candidate_order);
+          if(data.candidate_order == null) setCandidateOrder("N/A");
           party_id = data.party_id;
           return fetch('/voting-events/'+data.v_event_id);
         }).then(function(response) {
@@ -55,6 +57,7 @@ export default function CandidateShow(props) {
           mon = ('0' + (date.getMonth() + 1)).slice(-2);
           year = date.getFullYear();
           var vend = day + "/" + mon + "/" + year;
+          setEventID(data.id);
           setEventName(data.event_name);
           setEventYear(data.year);
           setVoteStart(vstart);
@@ -102,7 +105,7 @@ export default function CandidateShow(props) {
       }}>
         Delete
     </Button>
-    <Link to={"/candidates/"}>
+    <Link to={"/voting_events/"+v_event_id+"/candidates/"}>
       <Button variant="contained">
         Back to Candidates
       </Button>
@@ -110,3 +113,5 @@ export default function CandidateShow(props) {
 		</div>
 		)
 }
+
+export default withAuthorisation(CandidateShow, "commissioner")

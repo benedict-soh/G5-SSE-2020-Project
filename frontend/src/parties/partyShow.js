@@ -4,6 +4,7 @@ import {Route, withRouter, Switch, Link} from "react-router-dom";
 import { TextField,Button } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import '../App.css';
+import {withAuthorisation} from "../components/AuthWrapper"
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -19,7 +20,7 @@ const useStyles = makeStyles((theme) => ({
 
 const excludeArr = {0: "Included", 1: "Excluded"};
 
-export default function PartyShow(props) {
+function PartyShow(props) {
   const id = props.match.params.id;
 	const classes = useStyles();
   const [candidates, setCandidates] = useState([]);
@@ -64,7 +65,6 @@ export default function PartyShow(props) {
       fetch('/candidates?party_id='+id).then(response =>
         response.json().then(data => {
           setCandidates(data);
-          console.log(data);
         })
       );
     }
@@ -113,3 +113,5 @@ export default function PartyShow(props) {
 		</div>
 		)
 }
+
+export default withAuthorisation(PartyShow, "commissioner")

@@ -3,8 +3,9 @@ import NavigationTopBar from '../navigation/NavigationTopBar'
 import {Route, withRouter, Switch, useParams} from "react-router-dom";
 import '../App.css';
 import VotingEventForm from "./votingEventForm"
+import {withAuthorisation} from "../components/AuthWrapper"
 
-export default function VotingEventEdit(props) {
+function VotingEventEdit(props) {
   const id = props.match.params.id;
   const [voteEvent, setVoteEvent] = useState('');
 
@@ -25,7 +26,6 @@ export default function VotingEventEdit(props) {
           var vend = year + "-" + mon + "-" + day;
           data.vote_start = vstart;
           data.vote_end = vend;
-          console.log(data);
           setVoteEvent(data);
         })
       );
@@ -36,3 +36,5 @@ export default function VotingEventEdit(props) {
     <VotingEventForm voteEvent={voteEvent} event_id={id} />
   )
 }
+
+export default withAuthorisation(VotingEventEdit, "commissioner")

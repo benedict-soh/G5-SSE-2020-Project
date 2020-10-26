@@ -8,7 +8,8 @@ First, setup a venv. The `.gitignore` file already ignores the generated diretor
 
 Then run the command:
 
-`source env/bin/activate`
+`source env/bin/activate` on UNIX systems or
+`source env/Scripts/activate` on Windows
 
 Then install all required dependencies:
 
@@ -30,6 +31,6 @@ Fun DB related reading material (injection free): https://flask.palletsprojects.
 
 
 ## API doc
-See `API_endpoint.md` for all currently supported API. 
+See `API_endpoint.md` for all currently supported API.
 
 I swear to god if anyone ask me on discord what are the endpoints i will physically delete them IRL.

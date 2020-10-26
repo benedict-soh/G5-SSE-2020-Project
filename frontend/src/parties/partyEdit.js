@@ -3,8 +3,9 @@ import NavigationTopBar from '../navigation/NavigationTopBar'
 import {Route, withRouter, Switch, useParams} from "react-router-dom";
 import '../App.css';
 import PartyForm from "./partyForm"
+import {withAuthorisation} from "../components/AuthWrapper"
 
-export default function PartyEdit(props) {
+function PartyEdit(props) {
   const id = props.match.params.id;
   const [party, setParty] = useState('');
 
@@ -24,3 +25,5 @@ export default function PartyEdit(props) {
     <PartyForm party={party} party_id={id} />
   )
 }
+
+export default withAuthorisation(PartyEdit, "commissioner")

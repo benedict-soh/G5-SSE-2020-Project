@@ -2,7 +2,6 @@ import React, {useEffect, useState} from 'react';
 import {Link} from "react-router-dom";
 import { withStyles, makeStyles } from '@material-ui/core/styles';
 import { Button } from '@material-ui/core';
-import { FormControl } from '@material-ui/core';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableRow from '@material-ui/core/TableRow';
@@ -79,7 +78,7 @@ export default function PartyRows({parties }){
           		});
           		if(response.ok) {
           			console.log("Deleted party");
-          			window.location.replace("/parties");
+          			window.location.replace("/voting_events/"+row.v_event_id+"/parties");
           		} else {
           			console.log("Didnt delete party");
           		}

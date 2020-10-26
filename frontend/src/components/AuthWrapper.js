@@ -49,6 +49,7 @@ export function withAuthorisation(WrappedComponent, role) {
                 }).then(r => {
                     if(r && r.status && r.status === 200){
                         this.setState({authorisation: r.data, loadingAuthorisation: false});
+                        this.props.setAuth(r.data);
                     }
                 });
 
@@ -72,12 +73,13 @@ export function withAuthorisation(WrappedComponent, role) {
     const mapDispatchToProps = (dispatch) => ({
         logout: () => dispatch(authActions.logout()),
         login: () => dispatch(authActions.login()),
+        setAuth: (auth) => dispatch(authActions.setAuth(auth)),
     });
 
     const mapStateToProps = (state) => ({
         isLoggedIn: state.authReducer.isLoggedIn,
+        authorisation: state.authReducer.authorisation,
     });
 
     return connect(mapStateToProps, mapDispatchToProps)(AuthWrapper);
 }
-

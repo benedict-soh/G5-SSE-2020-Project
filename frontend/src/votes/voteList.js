@@ -2,7 +2,7 @@ import React, {Component, useEffect, useState} from 'react';
 import NavigationTopBar from '../navigation/NavigationTopBar'
 import {Route, withRouter, Switch, Link} from "react-router-dom";
 import { withStyles, makeStyles } from '@material-ui/core/styles';
-import PartyRows from '../components/party_rows'
+import VotingEventRows from '../components/voting_events_rows'
 import Button from '@material-ui/core/Button';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -30,48 +30,46 @@ const useStyles = makeStyles({
   },
 });
 
-function PartyList(props) {
-  const id = props.match.params.id;
-	const [parties, setParties] = useState([]);
+function VoteList(props) {
+  const [voting_events, setVotingEvents] = useState([]);
+  const [allowed_events, setAllowedEvents] = useState([]);
   const classes = useStyles();
 
   useEffect(() => {
-    fetch('/parties?v_event_id='+id).then(response =>
+    fetch('/voting-events').then(response =>
       response.json().then(data => {
-				setParties(data);
+				setVotingEvents(data);
+      })
+    );
+  }, [])
+
+  useEffect(() => {
+    fetch('/voting-events/open').then(response =>
+      response.json().then(data => {
+				setAllowedEvents(data.v_event_id_list);
       })
     );
   }, [])
 
 	return(
 			<div style={{ height: 300, width: '100%' }}>
-        <h1>Parties</h1>
-        <Link to={"/voting_events/"+id}>
-          <Button variant="contained">
-            Back to Event
-          </Button>
-        </Link>
-        <Link to={"/parties/create/"+id}>
-          <Button variant="contained" color="primary">
-            Create New Party
-          </Button>
-        </Link>
+        <h1>Voting Events</h1>
         <TableContainer component={Paper}>
         <Table className={classes.table} aria-label="customized table">
           <TableHead>
             <TableRow>
-              <StyledTableCell>Party Name</StyledTableCell>
-              <StyledTableCell align="center">Voting Event</StyledTableCell>
-              <StyledTableCell align="right">View Party</StyledTableCell>
-              <StyledTableCell align="right">Edit Party</StyledTableCell>
-              <StyledTableCell align="right">Delete Party</StyledTableCell>
+              <StyledTableCell>Event Name</StyledTableCell>
+              <StyledTableCell align="right">Year</StyledTableCell>
+              <StyledTableCell align="right">Vote Start Date</StyledTableCell>
+              <StyledTableCell align="right">Vote End Date</StyledTableCell>
+              <StyledTableCell align="right">Vote</StyledTableCell>
             </TableRow>
           </TableHead>
-          <PartyRows parties={parties} />
+          <VotingEventRows voting_events={voting_events} allowed_events={allowed_events} voter="yes" />
         </Table>
       </TableContainer>
     </div>
 		);
 }
 
-export default withAuthorisation(PartyList, "commissioner")
+export default withAuthorisation(VoteList, "voter")

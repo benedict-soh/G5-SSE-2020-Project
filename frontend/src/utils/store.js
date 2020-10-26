@@ -2,13 +2,18 @@ import {combineReducers, createStore} from "redux"
 
 
 export const authActions = {
-    check_login,
     login,
     logout,
+    setAuth,
+    resetAuth,
 };
 
-function check_login() {
+function setAuth(userType){
+    return {type: AuthorisationActionTypes.USER_UPDATE_AUTH, payload: userType};
+}
 
+function resetAuth(){
+    return {type: AuthorisationActionTypes.USER_NO_AUTH};
 }
 
 function login() {
@@ -25,10 +30,17 @@ const LoginActionTypes = {
     USER_LOGGED_OUT: 'USER_LOGGED_OUT',
 };
 
+const AuthorisationActionTypes = {
+    //authorisation actions
+    USER_UPDATE_AUTH: 'USER_UPDATE_AUTH',
+    USER_NO_AUTH: 'USER_NO_AUTH',
+};
+
 
 
 export const initialState = {
     isLoggedIn: false,
+    authorisation: false,
 };
 
 const authReducer = (state = initialState, authActions) => {
@@ -38,6 +50,12 @@ const authReducer = (state = initialState, authActions) => {
         }
         case LoginActionTypes.USER_LOGGED_OUT:{
             return {...state, isLoggedIn: false};
+        }
+        case AuthorisationActionTypes.USER_UPDATE_AUTH:{
+            return {...state, authorisation: authActions.payload};
+        }
+        case AuthorisationActionTypes.USER_NO_AUTH:{
+            return {...state, authorisation: false};
         }
         default:
             return state;
