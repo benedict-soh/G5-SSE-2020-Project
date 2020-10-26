@@ -101,7 +101,7 @@ class loginPage extends Component {
             return <Redirect push to="/vote"/>
         }
         if (this.props.isLoggedIn && this.state.authorisation === "commissioner") {
-            return <Redirect push to="/voting-events"/>
+            return <Redirect push to="/voting_events"/>
         }
         return (
             <Grid container style={loginStyles.whiteBackground}>
