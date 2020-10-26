@@ -1,8 +1,7 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {Link} from "react-router-dom";
 import { withStyles, makeStyles } from '@material-ui/core/styles';
 import { Button } from '@material-ui/core';
-import { FormControl } from '@material-ui/core';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableRow from '@material-ui/core/TableRow';
@@ -32,7 +31,8 @@ const useStyles = makeStyles({
   },
 });
 
-export default function VotingEventRows({voting_events }){
+export default function VotingEventRows({voting_events,voter}){
+
   var date;
   var day;
   var mon;
@@ -52,6 +52,25 @@ export default function VotingEventRows({voting_events }){
       mon = date.getMonth() + 1;
       year = date.getFullYear();
       vend = day + "/" + mon + "/" + year;
+      if(voter=="yes")
+      return (
+      <StyledTableRow key={row.event_name}>
+        <StyledTableCell component="th" scope="row">
+          {row.event_name}
+        </StyledTableCell>
+        <StyledTableCell align="right">{row.year}</StyledTableCell>
+        <StyledTableCell align="right">{vstart}</StyledTableCell>
+        <StyledTableCell align="right">{vend}</StyledTableCell>
+        <StyledTableCell align="right">
+          <Link to={"/vote/"+row.id}>
+            <Button variant="contained">
+              View
+            </Button>
+          </Link>
+        </StyledTableCell>
+      </StyledTableRow>
+      )
+      else
       return (
       <StyledTableRow key={row.event_name}>
         <StyledTableCell component="th" scope="row">
