@@ -12,8 +12,6 @@ export default function VotingEventEdit(props) {
     if(id) {
       fetch('/voting-events/'+id).then(response =>
         response.json().then(data => {
-          // setEvents(data.events);
-
           // Format the data
           var date = new Date(data.vote_start);
           var day = ('0' + date.getDate()).slice(-2);

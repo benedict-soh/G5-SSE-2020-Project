@@ -40,7 +40,6 @@ export default function PartyShow(props) {
         }).then(function(response) {
           return response.json();
         }).then(function(data) {
-          console.log(data);
           var date = new Date(data.vote_start);
           var day = ('0' + date.getDate()).slice(-2);
           var mon = ('0' + (date.getMonth() + 1)).slice(-2);
@@ -72,7 +71,7 @@ export default function PartyShow(props) {
   }, [])
 
 	return(
-		<div>
+		<div className={classes.root}>
     <h1>ID: {id}</h1>
 		<h1>{party_name}</h1>
     <h3><u>Associated Voting Event Information</u></h3>

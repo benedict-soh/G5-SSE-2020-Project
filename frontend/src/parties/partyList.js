@@ -29,12 +29,13 @@ const useStyles = makeStyles({
   },
 });
 
-export default function PartyList() {
+export default function PartyList(props) {
+  const id = props.match.params.id;
 	const [parties, setParties] = useState([]);
   const classes = useStyles();
 
   useEffect(() => {
-    fetch('/parties').then(response =>
+    fetch('/parties?v_event_id='+id).then(response =>
       response.json().then(data => {
 				setParties(data);
       })
@@ -43,7 +44,13 @@ export default function PartyList() {
 
 	return(
 			<div style={{ height: 300, width: '100%' }}>
-        <Link to={"/parties/create/"}>
+        <h1>Parties</h1>
+        <Link to={"/voting_events/"+id}>
+          <Button variant="contained">
+            Back to Event
+          </Button>
+        </Link>
+        <Link to={"/parties/create/"+id}>
           <Button variant="contained" color="primary">
             Create New Party
           </Button>
