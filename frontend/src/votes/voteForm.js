@@ -157,7 +157,8 @@ export default function PartyForm({voting_event, party, party_id}) {
         }
       }
     }
-    const newVote = {v_event_id: id, above: submitAbove, below: submitBelow};
+    const newVote = {v_event_id: id, vote_data: {above: submitAbove, below: submitBelow}};
+    console.log(JSON.stringify(newVote));
 		const response = await fetch("/votes/create", {
 			method: "POST",
 			headers: {

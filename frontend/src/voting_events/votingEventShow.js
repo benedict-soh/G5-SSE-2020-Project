@@ -23,6 +23,9 @@ export default function VotingEventShow(props) {
   const id = props.match.params.id;
 	const classes = useStyles();
   const [candidates, setCandidates] = useState([]);
+  const [tally, setTally] = useState([]);
+  const [partyTally, setPartyTally] = useState([]);
+  const [candidateTally, setCandidateTally] = useState([]);
   const [parties, setParties] = useState([]);
   const [partiesDict, setPartiesDict] = useState([]);
 	const [event_name, setEventName] = useState("");
@@ -56,25 +59,40 @@ export default function VotingEventShow(props) {
 
   useEffect(() => {
     if(id) {
+      var party2 = [];
+      var candid2 = [];
       fetch('/candidates?v_event_id='+id).then(response =>
         response.json().then(data => {
-          setCandidates(data);
-        })
-      );
-    }
-  }, [])
-
-  useEffect(() => {
-    if(id) {
-      fetch('/parties?v_event_id='+id).then(response =>
-        response.json().then(data => {
-          setParties(data);
+          candid2 = data;
+          return fetch('/parties?v_event_id='+id);
+        }).then(function(response) {
+          return response.json();
+        }).then(function(data) {
+          party2 = data;
           var partyArr = {};
           partyArr[null] = "No Party";
           for(var i=0;i<data.length;i++){
             partyArr[data[i].id] = data[i].party_name;
           }
   				setPartiesDict(partyArr);
+          return fetch('/voting-events/'+id+'/tally');
+        }).then(function(response) {
+          return response.json();
+        }).then(function(data) {
+          setTally(data);
+          var parTally = {};
+          var canTally = {};
+          for(var i=0;i<data.above.length;i++){
+            parTally[data.above[i].party_id] = data.above[i].votes;
+          }
+          for(var i=0;i<data.below.length;i++){
+            canTally[data.below[i].candidate_id] = data.below[i].votes;
+          }
+          setPartyTally(parTally);
+          setCandidateTally(canTally);
+          // parties and candidates has to be after tally or it wont render
+          setParties(party2)
+          setCandidates(candid2);;
         })
       );
     }
@@ -87,16 +105,39 @@ export default function VotingEventShow(props) {
     <h2>Year: {year}</h2>
     <h3>Vote Start Date: {vote_start}</h3>
     <h3>Vote Start End: {vote_end}</h3>
+    <h3>Total Votes (Above/Below): {tally.total} ({tally.total_above}/{tally.total_below})</h3>
     <h3><u>Associated Parties</u></h3>
     {parties.map((row) => {
       return (
+        <div>
         <h3>{row.party_name}</h3>
+        <ul>
+        {partyTally[row.id].map((voteRow) => {
+          var pref = Object.entries(voteRow)[0][0];
+          var votes = Object.entries(voteRow)[0][1];
+          return (
+            <li>Preference {pref} - {votes} Votes</li>
+          )
+        })}
+        </ul>
+        </div>
       )
     })}
     <h3><u>Associated Candidates</u></h3>
     {candidates.map((row) => {
       return (
+        <div>
         <h3>[{excludeArr[row.exclude]}] {partiesDict[row.party_id]} - {row.candidate_name} (Ballot Order: {row.candidate_order})</h3>
+        <ul>
+        {candidateTally[row.id].map((voteRow) => {
+          var pref = Object.entries(voteRow)[0][0];
+          var votes = Object.entries(voteRow)[0][1];
+          return (
+            <li>Preference {pref} - {votes} Votes</li>
+          )
+        })}
+        </ul>
+        </div>
       )
     })}
     <div>

@@ -31,12 +31,21 @@ const useStyles = makeStyles({
 
 export default function VoteList(props) {
   const [voting_events, setVotingEvents] = useState([]);
+  const [allowed_events, setAllowedEvents] = useState([]);
   const classes = useStyles();
 
   useEffect(() => {
     fetch('/voting-events').then(response =>
       response.json().then(data => {
 				setVotingEvents(data);
+      })
+    );
+  }, [])
+
+  useEffect(() => {
+    fetch('/voting-events/open').then(response =>
+      response.json().then(data => {
+				setAllowedEvents(data.v_event_id_list);
       })
     );
   }, [])
@@ -55,7 +64,7 @@ export default function VoteList(props) {
               <StyledTableCell align="right">Vote</StyledTableCell>
             </TableRow>
           </TableHead>
-          <VotingEventRows voting_events={voting_events} voter="yes" />
+          <VotingEventRows voting_events={voting_events} allowed_events={allowed_events} voter="yes" />
         </Table>
       </TableContainer>
     </div>

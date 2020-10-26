@@ -79,7 +79,9 @@ export default function CandidateForm({voting_event, candidate, candidate_id}) {
   }, [voting_event])
 
 	const createCandidate = async () => {
-		const newCandidate = {candidate_name, v_event_id: id, party_id, exclude, candidate_order: parseInt(candidate_order)};
+    var useExclude = exclude;
+    if(exclude == "") useExclude = 0;
+		const newCandidate = {candidate_name, v_event_id: id, party_id, exclude: useExclude, candidate_order: parseInt(candidate_order)};
     if(party_id == -1) delete newCandidate['party_id'];
 		const response = await fetch("/candidates/create", {
 			method: "POST",
@@ -89,7 +91,7 @@ export default function CandidateForm({voting_event, candidate, candidate_id}) {
 			body: JSON.stringify(newCandidate)
 		});
 		if(response.ok) {
-			console.log("Created party");
+			console.log("Created candidate");
 			window.location.replace("/voting_events/"+id+"/candidates");
 		} else {
 			console.log("Didnt create candidate");
@@ -97,7 +99,9 @@ export default function CandidateForm({voting_event, candidate, candidate_id}) {
 	}
 
 	const updateCandidate = async () => {
-		var updateCandidate = {candidate_name, v_event_id: id, party_id, exclude, candidate_order: parseInt(candidate_order)};
+    var useExclude = exclude;
+    if(exclude == "") useExclude = 0;
+		var updateCandidate = {candidate_name, v_event_id: id, party_id, exclude: useExclude, candidate_order: parseInt(candidate_order)};
     if(party_id == -1) delete updateCandidate['party_id'];
 		const response = await fetch("/candidates/"+candidate_id+"/update", {
 			method: "PUT",
@@ -121,7 +125,7 @@ export default function CandidateForm({voting_event, candidate, candidate_id}) {
   var vstart;
   var vend;
 	return(
-		<form className={classes.root} noValidate autoComplete="off">
+		<form className={classes.root} autoComplete="off">
 		<h1>{CRUD} Candidate</h1>
 		<div>
 			<TextField
@@ -174,7 +178,7 @@ export default function CandidateForm({voting_event, candidate, candidate_id}) {
         label="Exclude Candidate"
         value={exclude}
         onChange={(event) => setExclude(event.target.value)}
-        helperText="Determines whether candidate shows on the ballot"
+        helperText="Determines whether candidate shows on the ballot, included by default"
         variant="outlined"
       >
         <MenuItem value='1'>Exclude Candidate</MenuItem>

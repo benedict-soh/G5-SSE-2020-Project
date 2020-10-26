@@ -59,11 +59,12 @@ class loginPage extends Component {
                 (r) => {
                     if (r === 200){
                         this.props.login();
+                        this.setState({isPageLoading: false});
                     }
                 }).catch((err) => {
                     console.log(err)
                     this.props.logout();
-                    this.setState({isPageLoading: false})
+                    this.setState({isPageLoading: false});
                 });
     }
 
