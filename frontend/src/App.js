@@ -3,6 +3,8 @@ import NavigationTopBar from './navigation/NavigationTopBar'
 import {Route, withRouter, Switch} from "react-router-dom";
 import './App.css';
 import voterRoutes from "./routes/voterRoutes";
+import VoteCreate from "./votes/voteCreate"
+import VoteList from "./votes/voteList"
 import VotingEventForm from "./voting_events/votingEventForm"
 import VotingEventList from "./voting_events/votingEventList"
 import VotingEventEdit from "./voting_events/votingEventEdit"
@@ -61,7 +63,8 @@ class App extends Component {
                 <NavigationTopBar {...this.props}/>
                     <Switch>
                         {/* add new routes inside this switch */}
-                        <Route strict path="/vote" component={voterRoutes}/>
+                        <Route path="/vote/:id" component={VoteCreate}/>
+                        <Route exact path="/vote" component={VoteList}/>
                         <Route path="/voting_events/:id/candidates" component={CandidateList}/>
                         <Route path="/voting_events/:id/parties" component={PartyList}/>
                         <Route path="/voting_events/create" component={VotingEventForm}/>

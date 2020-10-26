@@ -64,7 +64,6 @@ export default function PartyShow(props) {
       fetch('/candidates?party_id='+id).then(response =>
         response.json().then(data => {
           setCandidates(data);
-          console.log(data);
         })
       );
     }

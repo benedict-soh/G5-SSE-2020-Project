@@ -65,7 +65,7 @@ class loginPage extends Component {
                 (r) => {
                     if(r && r.status && r.status === 200){
                         this.props.login();
-                        this.setState({isPageLoading: false})
+                         this.setState({isPageLoading: false})
                     }
                 });
     }
