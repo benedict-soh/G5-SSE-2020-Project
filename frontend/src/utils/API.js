@@ -1,10 +1,9 @@
 import axios from "axios";
-import Cookies from 'js-cookie';
-const BaseUrl = "http://127.0.0.1:5000";
 const loginAPI = "/auth/login"; // POST
 const logoutAPI= "/auth/logout"; // [POST, GET]
 const authTestAPI= "/auth/test"; // GET
 const getRoleAPI = "/auth/get-role"; // GET
+axios.defaults.timeout = 2000;
 
 
 // post API request for login
@@ -14,7 +13,6 @@ export async function login_request(username, password) {
         {"username" : username, "password" : password},
         {headers:{"Content-Type": "application/json"}}
         );
-    console.log(response);
     return response.data;
 }
 
@@ -27,13 +25,10 @@ export async function logout_request() {
 
 // post API request for logout
 export async function authTest_request() {
-    const response = await axios.get(authTestAPI);
-    return response;
+    return await axios.get(authTestAPI);
 }
 
 // get API request for authorisation
 export async function get_role() {
-    const response = await axios.get(getRoleAPI);
-    console.log(response)
-    return response;
+    return await axios.get(getRoleAPI);
 }

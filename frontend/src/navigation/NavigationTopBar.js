@@ -127,6 +127,7 @@ function logout(props){
         (r) => {
             if (r === 200){
                 props.logout();
+                props.history.push("/logout");
             }
         }).catch((err) => {
             console.log(err);
@@ -135,6 +136,7 @@ function logout(props){
 
 function NavigationTopBar(props) {
     const classes = useStyles();
+    const isLoggedIn = props.isLoggedIn;
     return (
         <AppBar position="static" className={classes.root}>
             <div className={classes.navWrapper}>
@@ -143,13 +145,19 @@ function NavigationTopBar(props) {
                 </div>
                 <Toolbar value= {false} className={classes.tab}>
                     <Tabs className={classes.tabs} fullWidth={true}>
+                        {isLoggedIn?
+                        <>
+                            <NavigationBarOption label={"Home"} to={"/"} />
+                            <NavigationBarOption label={"For Voters"} to={"/vote"} />
+                            <NavigationBarOption label={"For Parties"} to={"/parties"} />
+                            <NavigationBarOption label={"Events"} to={"/voting_events"} />
+                            <NavigationBarOption label={"Candidates"} to={"/candidates"} />
+                        </>
+                        :
                         <NavigationBarOption label={"Home"} to={"/"} />
-                        <NavigationBarOption label={"For Voters"} to={"/vote"} />
-                        <NavigationBarOption label={"For Parties"} to={"/parties"} />
-                        <NavigationBarOption label={"Events"} to={"/voting_events"} />
-                        <NavigationBarOption label={"Candidates"} to={"/candidates"} />
+                        }
                     </Tabs>
-                    {props.isLoggedIn? <LogoutAvatar logout={props.logout}/> : <LoginAvatar/>}
+                    {props.isLoggedIn? <LogoutAvatar logout={props.logout} {...props} /> : <LoginAvatar/>}
                 </Toolbar>
             </div>
         </AppBar>
