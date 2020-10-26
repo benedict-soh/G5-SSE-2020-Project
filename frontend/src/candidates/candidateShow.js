@@ -70,7 +70,7 @@ export default function CandidateShow(props) {
   }, [])
 
 	return(
-		<div>
+		<div className={classes.root}>
     <h1>ID: {id}</h1>
 		<h1>{candidate_name}</h1>
     <h2>{exclude}</h2>

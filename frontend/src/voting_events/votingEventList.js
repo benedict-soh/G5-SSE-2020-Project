@@ -37,14 +37,13 @@ export default function VotingEventList() {
     fetch('/voting-events').then(response =>
       response.json().then(data => {
 				setVotingEvents(data);
-        console.log("Test");
-				console.log(data);
       })
     );
   }, [])
 
 	return(
 			<div style={{ height: 300, width: '100%' }}>
+        <h1>Voting Events</h1>
         <Link to={"/voting_events/create/"}>
           <Button variant="contained" color="primary">
             Create New Event
