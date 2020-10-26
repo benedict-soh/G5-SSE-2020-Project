@@ -70,18 +70,20 @@ Requires a JSON object with the following fields:
 ```json
 {
     "v_event_id": "a number",
-    "above": [
-      {
-        "party_id": "a number",
-        "number": "a number"
-      }
-    ],
-    "below": [
-      {
-        "candidate_id": "a number",
-        "number": "a number"
-      }
-    ]
+    "vote_data": {
+      "above": [
+        {
+          "party_id": "a number",
+          "number": "a number"
+        }
+      ],
+      "below": [
+        {
+          "candidate_id": "a number",
+          "number": "a number"
+        }
+      ]
+    }
 }
 ```
 

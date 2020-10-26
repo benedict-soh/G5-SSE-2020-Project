@@ -101,7 +101,7 @@ export default function CandidateForm({voting_event, candidate, candidate_id}) {
 	const updateCandidate = async () => {
     var useExclude = exclude;
     if(exclude == "") useExclude = 0;
-		var updateCandidate = {candidate_name, v_event_id: id, party_id, exclude: useExclude, candidate_order: parseInt(candidate_order)};
+		const updateCandidate = {candidate_name, v_event_id: id, party_id, exclude: useExclude, candidate_order: parseInt(candidate_order)};
     if(party_id == -1) delete updateCandidate['party_id'];
 		const response = await fetch("/candidates/"+candidate_id+"/update", {
 			method: "PUT",

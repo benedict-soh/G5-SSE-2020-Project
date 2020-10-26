@@ -7,7 +7,7 @@ import makeStyles from "@material-ui/core/styles/makeStyles";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import Button from "@material-ui/core/Button";
 import Grid from "@material-ui/core/Grid";
-import {authTest_request, login_request} from "../utils/API";
+import {authTest_request, get_role, login_request} from "../utils/API";
 import {Alert} from '@material-ui/lab';
 import { Redirect } from "react-router-dom";
 import {authActions} from "../utils/store";
@@ -22,6 +22,8 @@ class loginPage extends Component {
             isLoading: false,
             isRobot: true,
             error: "",
+            authorisation: false,
+            isloadingRedirect: true,
         };
         this.login = this.login.bind(this);
         this.onLoadRecaptcha = this.onLoadRecaptcha.bind(this);
@@ -29,6 +31,7 @@ class loginPage extends Component {
     }
     componentWillMount() {
         this.checkAuth();
+        this.checkRole();
     }
     componentDidMount() {
         if (this.captchaDemo) {
@@ -39,11 +42,11 @@ class loginPage extends Component {
     // the main login function that handles responses
     login(username, password) {
         this.setState({isLoading: true, error: ""});
-        if(!this.state.isRobot){
+        if (!this.state.isRobot) {
             login_request(username, password)
                 .then(r => {
-                    console.log(r);
                     this.props.login();
+                    this.checkRole();
                 }).catch((err) => {
                 this.setState({isLoading: false, error: err.message});
             })
@@ -55,17 +58,28 @@ class loginPage extends Component {
 
     checkAuth(){
         authTest_request()
-            .then(
+            .catch((err) => {
+                this.props.logout();
+                this.setState({isPageLoading: false})
+            }).then(
                 (r) => {
-                    if (r === 200){
+                    if(r && r.status && r.status === 200){
                         this.props.login();
-                        this.setState({isPageLoading: false});
+                         this.setState({isPageLoading: false})
                     }
-                }).catch((err) => {
-                    console.log(err)
-                    this.props.logout();
-                    this.setState({isPageLoading: false});
                 });
+    }
+
+    checkRole() {
+        get_role()
+            .catch(err => {
+                this.setState({authorisation: false, isloadingRedirect: false});
+            }).then(r => {
+            if (r && r.status && r.status === 200) {
+                this.setState({authorisation: r.data, isloadingRedirect: false});
+            }
+        });
+
     }
 
     onLoadRecaptcha() {
@@ -80,30 +94,33 @@ class loginPage extends Component {
     }
 
     render() {
-        if (this.state.isPageLoading) {
+        if (this.state.isPageLoading || this.state.isloadingRedirect) {
             return <><h1>loading...</h1><CircularProgress size="72px"/></>;
         }
+        if (this.props.isLoggedIn && this.state.authorisation === "voter") {
+            return <Redirect push to="/vote"/>
+        }
+        if (this.props.isLoggedIn && this.state.authorisation === "commissioner") {
+            return <Redirect push to="/voting_events"/>
+        }
         return (
-            <>
-                {this.props.isLoggedIn? <Redirect push to="/vote" /> :
-                <Grid container style={loginStyles.whiteBackground}>
-                    <Grid item xs={12}>
-                        {this.state.error && <Alert severity="error">{this.state.error}</Alert>}
-                        <LoginForm isLoading={this.state.isLoading} isError={this.state.error} login={this.login}/>
-                        <ReCaptcha
-                            ref={(el) => {this.captchaDemo = el;}}
-                            size="normal"
-                            data-theme="dark"
-                            render="explicit"
-                            sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"
-                            onloadCallback={this.onLoadRecaptcha}
-                            verifyCallback={this.verifyCallback}
-                        />
-                    </Grid>
+            <Grid container style={loginStyles.whiteBackground}>
+                <Grid item xs={12}>
+                    {this.state.error && <Alert severity="error">{this.state.error}</Alert>}
+                    <LoginForm isLoading={this.state.isLoading} isError={this.state.error} login={this.login}/>
+                    <ReCaptcha
+                        ref={(el) => {
+                            this.captchaDemo = el;
+                        }}
+                        size="normal"
+                        data-theme="dark"
+                        render="explicit"
+                        sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"
+                        onloadCallback={this.onLoadRecaptcha}
+                        verifyCallback={this.verifyCallback}
+                    />
                 </Grid>
-                }
-            </>
-
+            </Grid>
         );
 
     }
