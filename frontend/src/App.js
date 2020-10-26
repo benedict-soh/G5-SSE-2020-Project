@@ -45,7 +45,7 @@ class App extends Component {
         authTest_request()
             .then(
                 (r) => {
-                    if (r === 200){
+                    if (r && r.status && r.status === 200){
                         this.props.login();
                     }
                 }).catch((err) => {
@@ -75,13 +75,6 @@ class App extends Component {
                         <Route exact path="/candidates" component={CandidateList}/>
                         <Route strict path="/login" component={loginPage}/>
                     </Switch>
-                    <a
-                        className="App-link"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                    >
-                        Login to Vote
-                    </a>
             </div>
         );
     }

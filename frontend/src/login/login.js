@@ -57,8 +57,9 @@ class loginPage extends Component {
         authTest_request()
             .then(
                 (r) => {
-                    if (r === 200){
+                    if(r && r.status && r.status === 200){
                         this.props.login();
+                        this.setState({isPageLoading: false})
                     }
                 }).catch((err) => {
                     console.log(err)
