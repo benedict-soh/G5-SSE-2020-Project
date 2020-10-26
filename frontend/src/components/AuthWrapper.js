@@ -49,6 +49,7 @@ export function withAuthorisation(WrappedComponent, role) {
                 }).then(r => {
                     if(r && r.status && r.status === 200){
                         this.setState({authorisation: r.data, loadingAuthorisation: false});
+                        this.props.setAuth(r.data);
                     }
                 });
 
