@@ -4,6 +4,7 @@ import {Route, withRouter, Switch, useParams} from "react-router-dom";
 import '../App.css';
 import PartyForm from "./partyForm"
 import {withAuthorisation} from "../components/AuthWrapper"
+import { get_party } from '../utils/API'
 
 function PartyEdit(props) {
   const id = props.match.params.id;
@@ -11,13 +12,12 @@ function PartyEdit(props) {
 
   useEffect(() => {
     if(id) {
-      fetch('/parties/'+id).then(response =>
-        response.json().then(data => {
-          console.log(data);
-          console.log("set party");
-          setParty(data);
-        })
-      );
+      async function fetchData() {
+        const response = await get_party(id);
+        setParty(response);
+      }
+
+      fetchData();
     }
   }, [])
 

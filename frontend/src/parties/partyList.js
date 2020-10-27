@@ -13,6 +13,7 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import '../App.css';
 import {withAuthorisation} from "../components/AuthWrapper"
+import { get_parties } from '../utils/API'
 
 const StyledTableCell = withStyles((theme) => ({
   head: {
@@ -36,11 +37,17 @@ function PartyList(props) {
   const classes = useStyles();
 
   useEffect(() => {
-    fetch('/parties?v_event_id='+id).then(response =>
-      response.json().then(data => {
-				setParties(data);
-      })
-    );
+    async function fetchData() {
+      const data = await get_parties(id);
+      var partyArr = {};
+      partyArr[null] = "No Party";
+      for(var i=0;i<data.length;i++){
+        partyArr[data[i].id] = data[i].party_name;
+      }
+      setParties(data);
+    }
+
+    fetchData();
   }, [])
 
 	return(

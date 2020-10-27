@@ -5,6 +5,7 @@ import { TextField,Button } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import '../App.css';
 import {withAuthorisation} from "../components/AuthWrapper"
+import { get_candidate_all } from "../utils/API";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -35,40 +36,32 @@ function CandidateShow(props) {
 
   useEffect(() => {
     if(id) {
-      var party_id;
-      fetch('/candidates/'+id).then(response =>
-        response.json().then(data => {
-          setCandidateName(data.candidate_name);
-          setExclude(excludeArr[data.exclude]);
-          setCandidateOrder(data.candidate_order);
-          if(data.candidate_order == null) setCandidateOrder("N/A");
-          party_id = data.party_id;
-          return fetch('/voting-events/'+data.v_event_id);
-        }).then(function(response) {
-          return response.json();
-        }).then(function(data) {
-          var date = new Date(data.vote_start);
-          var day = ('0' + date.getDate()).slice(-2);
-          var mon = ('0' + (date.getMonth() + 1)).slice(-2);
-          var year = date.getFullYear();
-          var vstart = day + "/" + mon + "/" + year;
-          date = new Date(data.vote_end);
-          day = ('0' + date.getDate()).slice(-2);
-          mon = ('0' + (date.getMonth() + 1)).slice(-2);
-          year = date.getFullYear();
-          var vend = day + "/" + mon + "/" + year;
-          setEventID(data.id);
-          setEventName(data.event_name);
-          setEventYear(data.year);
-          setVoteStart(vstart);
-          setVoteEnd(vend);
-          return fetch('/parties/'+party_id);
-        }).then(function(response) {
-          return response.json();
-        }).then(function(data) {
-          setPartyName(data.party_name);
-        })
-      );
+      async function fetchData() {
+        const response = await get_candidate_all(id);
+        setCandidateName(response.candidate.candidate_name);
+        setExclude(excludeArr[response.candidate.exclude]);
+        setCandidateOrder(response.candidate.candidate_order);
+
+        var date = new Date(response.votingEvent.vote_start);
+        var day = ('0' + date.getDate()).slice(-2);
+        var mon = ('0' + (date.getMonth() + 1)).slice(-2);
+        var year = date.getFullYear();
+        var vstart = day + "/" + mon + "/" + year;
+        date = new Date(response.votingEvent.vote_end);
+        day = ('0' + date.getDate()).slice(-2);
+        mon = ('0' + (date.getMonth() + 1)).slice(-2);
+        year = date.getFullYear();
+        var vend = day + "/" + mon + "/" + year;
+        setEventID(response.votingEvent.id);
+        setEventName(response.votingEvent.event_name);
+        setEventYear(response.votingEvent.year);
+        setVoteStart(vstart);
+        setVoteEnd(vend);
+
+        setPartyName(response.party.party_name);
+      }
+
+      fetchData();
     }
   }, [])
 
@@ -98,14 +91,14 @@ function CandidateShow(props) {
         });
         if(response.ok) {
           console.log("Deleted candidate");
-          window.location.replace("/candidates");
+          window.location.replace("/voting_events/"+v_event_id+"/candidates");
         } else {
           console.log("Didnt delete candidate");
         }
       }}>
         Delete
     </Button>
-    <Link to={"/voting_events/"+v_event_id+"/candidates/"}>
+    <Link to={`/voting_events/${v_event_id}/candidates`}>
       <Button variant="contained">
         Back to Candidates
       </Button>

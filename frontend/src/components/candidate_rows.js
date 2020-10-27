@@ -5,7 +5,7 @@ import { Button } from '@material-ui/core';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableRow from '@material-ui/core/TableRow';
-
+import { get_events, get_parties, delete_candidate } from '../utils/API'
 
 const StyledTableCell = withStyles((theme) => ({
   head: {
@@ -38,28 +38,30 @@ export default function CandidateRows({candidates }){
   const [parties, setParties] = useState([]);
 
   useEffect(() => {
-    fetch('/voting-events').then(response =>
-      response.json().then(data => {
-        var eventArr = {};
-        for(var i=0;i<data.length;i++){
-          eventArr[data[i].id] = data[i].event_name + ' (' + data[i].year + ')';
-        }
-				setVotingEvents(eventArr);
-      })
-    );
+    async function fetchData() {
+      const data = await get_events();
+      var eventArr = {};
+      for(var i=0;i<data.length;i++){
+        eventArr[data[i].id] = data[i].event_name + ' (' + data[i].year + ')';
+      }
+      setVotingEvents(eventArr);
+    }
+
+    fetchData();
   }, [])
 
   useEffect(() => {
-    fetch('/parties').then(response =>
-      response.json().then(data => {
-        var partyArr = {};
-        partyArr[null] = "No Party";
-        for(var i=0;i<data.length;i++){
-          partyArr[data[i].id] = data[i].party_name;
-        }
-				setParties(partyArr);
-      })
-    );
+    async function fetchData() {
+      const data = await get_parties();
+      var partyArr = {};
+      partyArr[null] = "No Party";
+      for(var i=0;i<data.length;i++){
+        partyArr[data[i].id] = data[i].party_name;
+      }
+      setParties(partyArr);
+    }
+
+    fetchData();
   }, [])
 
   return (
@@ -91,9 +93,7 @@ export default function CandidateRows({candidates }){
           <Button variant="contained"
             color="secondary"
             onClick={async() => {
-              const response = await fetch("/candidates/"+row.id+"/delete", {
-          			method: "DELETE"
-          		});
+              const response = await delete_candidate(row.id);
           		if(response.ok) {
           			console.log("Deleted candidate");
           			window.location.replace("/voting_events/"+row.v_event_id+"/candidates");

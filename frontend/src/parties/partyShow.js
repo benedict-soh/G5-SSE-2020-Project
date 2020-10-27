@@ -5,6 +5,7 @@ import { TextField,Button } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import '../App.css';
 import {withAuthorisation} from "../components/AuthWrapper"
+import { get_party_all, get_candidates_party, delete_party } from '../utils/API'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -33,40 +34,38 @@ function PartyShow(props) {
 
   useEffect(() => {
     if(id) {
-      fetch('/parties/'+id).then(responseParty =>
-        responseParty.json().then(dataParty => {
-          setPartyName(dataParty.party_name);
-          setEventID(dataParty.v_event_id);
-          return fetch('/voting-events/'+dataParty.v_event_id);
-        }).then(function(response) {
-          return response.json();
-        }).then(function(data) {
-          var date = new Date(data.vote_start);
-          var day = ('0' + date.getDate()).slice(-2);
-          var mon = ('0' + (date.getMonth() + 1)).slice(-2);
-          var year = date.getFullYear();
-          var vstart = day + "/" + mon + "/" + year;
-          date = new Date(data.vote_end);
-          day = ('0' + date.getDate()).slice(-2);
-          mon = ('0' + (date.getMonth() + 1)).slice(-2);
-          year = date.getFullYear();
-          var vend = day + "/" + mon + "/" + year;
-          setEventName(data.event_name);
-          setEventYear(data.year);
-          setVoteStart(vstart);
-          setVoteEnd(vend);
-        })
-      );
+      async function fetchData() {
+        const data = await get_party_all(id);
+        setPartyName(data.party.party_name);
+        setEventID(data.party.v_event_id);
+        var date = new Date(data.votingEvent.vote_start);
+        var day = ('0' + date.getDate()).slice(-2);
+        var mon = ('0' + (date.getMonth() + 1)).slice(-2);
+        var year = date.getFullYear();
+        var vstart = day + "/" + mon + "/" + year;
+        date = new Date(data.votingEvent.vote_end);
+        day = ('0' + date.getDate()).slice(-2);
+        mon = ('0' + (date.getMonth() + 1)).slice(-2);
+        year = date.getFullYear();
+        var vend = day + "/" + mon + "/" + year;
+        setEventName(data.votingEvent.event_name);
+        setEventYear(data.votingEvent.year);
+        setVoteStart(vstart);
+        setVoteEnd(vend);
+      }
+
+      fetchData();
     }
   }, [])
 
   useEffect(() => {
     if(id) {
-      fetch('/candidates?party_id='+id).then(response =>
-        response.json().then(data => {
-          setCandidates(data);
-        })
-      );
+      async function fetchData() {
+        const data = await get_candidates_party(id);
+        setCandidates(data);
+      }
+
+      fetchData();
     }
   }, [])
 
@@ -81,8 +80,10 @@ function PartyShow(props) {
     <h3>Vote Start End: {vote_end}</h3>
     <h3><u>Associated Candidates</u></h3>
     {candidates.map((row) => {
+      var rowOrder = row.candidate_order;
+      if(rowOrder == null) rowOrder = "N/A";
       return (
-        <h3>[{excludeArr[row.exclude]}] {row.candidate_name} (Ballot Order: {row.candidate_order})</h3>
+        <h3>[{excludeArr[row.exclude]}] {row.candidate_name} (Ballot Order: {rowOrder})</h3>
       )
     })}
     <Link to={"/parties/update/"+id}>
@@ -93,19 +94,17 @@ function PartyShow(props) {
     <Button variant="contained"
       color="secondary"
       onClick={async() => {
-        const response = await fetch("/parties/"+id+"/delete", {
-          method: "DELETE"
-        });
+        const response = await delete_party(id);
         if(response.ok) {
           console.log("Deleted party");
-          window.location.replace("/parties");
+          window.location.replace("/voting_events/"+v_event_id+"/parties");
         } else {
           console.log("Didnt delete party");
         }
       }}>
         Delete
     </Button>
-    <Link to={"/parties/"}>
+    <Link to={"/voting_events/"+v_event_id+"/parties"}>
       <Button variant="contained">
         Back to Parties
       </Button>

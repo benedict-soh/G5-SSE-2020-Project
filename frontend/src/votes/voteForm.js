@@ -5,6 +5,7 @@ import { TextField,Button,MenuItem } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import GridList from '@material-ui/core/GridList';
+import { create_vote, get_ballot } from '../utils/API'
 
 import '../App.css';
 
@@ -54,7 +55,6 @@ export default function PartyForm({voting_event, party, party_id}) {
   const [partiesDict, setPartiesDict] = useState([]);
   const [total_parties, setTotalParties] = useState("");
   const [candidates, setCandidates] = useState([]);
-  const [total_candidates, setTotalCandidates] = useState("");
 	const [party_name, setPartyName] = useState("");
   const [v_event_id, setEventID] = useState("");
   const [event_name, setEventName] = useState("");
@@ -87,48 +87,39 @@ export default function PartyForm({voting_event, party, party_id}) {
       setEventYear(voting_event.year);
       setVoteStart(voting_event.vote_start);
       setVoteEnd(voting_event.vote_end);
+
       var candidatesArr = {};
       candidatesArr[null] = [];
-      fetch('/parties?v_event_id='+voting_event.id).then(response =>
-        response.json().then(data => {
-          setParties(data);
-          setTotalParties(data.length);
-          // Create a parties dictionary for reference later
-          var partyArr = {};
-          var aboveSetup = {};
-          partyArr[null] = "No Party";
-          for(var i=0;i<data.length;i++){
-            partyArr[data[i].id] = data[i].party_name;
-            candidatesArr[data[i].id] = [];
-            aboveSetup[data[i].id] = -1;
-            // aboveSetup.push({"party_id": data[i].id, "number": -1});
+      async function fetchData() {
+        const data = await get_ballot(voting_event.id);
+        setParties(data.parties);
+        setTotalParties(data.parties.length);
+        var partyArr = {};
+        var aboveSetup = {};
+        partyArr[null] = "No Party";
+        for(var i=0;i<data.parties.length;i++){
+          partyArr[data.parties[i].id] = data.parties[i].party_name;
+          candidatesArr[data.parties[i].id] = [];
+          aboveSetup[data.parties[i].id] = -1;
+        }
+        setAbove(aboveSetup);
+        setPartiesDict(partyArr);
+        var belowSetup = {};
+        for(var i=0;i<data.candidates.length;i++){
+          // Map candidates to an array for sorting later
+          if(!data.candidates[i].exclude) {
+            // Set to high number to put at bottom of list if not set
+            if(data.candidates[i].candidate_order == null) data.candidates[i].candidate_order = 999;
+            candidatesArr[data.candidates[i].party_id].push(data.candidates[i]);
+            if(data.candidates[i].party_id != null) candidatesArr[data.candidates[i].party_id].sort(orderCompare);
+            belowSetup[data.candidates[i].id] = -1;
           }
-          // console.log(JSON.stringify(aboveSetup));
-          setAbove(aboveSetup);
-          setPartiesDict(partyArr);
-          return fetch('/candidates?v_event_id='+voting_event.id);
-        }).then(function(response) {
-          return response.json();
-        }).then(function(data) {
-          var belowSetup = {};
-          var totalCand = 0;
-          for(var i=0;i<data.length;i++){
-            // Map candidates to an array for sorting later
-            if(!data[i].exclude) {
-              // Set to high number to put at bottom of list if not set
-              if(data[i].candidate_order == null) data[i].candidate_order = 999;
-              candidatesArr[data[i].party_id].push(data[i]);
-              if(data[i].party_id != null) candidatesArr[data[i].party_id].sort(orderCompare);
-              belowSetup[data[i].id] = -1;
-              // belowSetup.push({"candidate_id": data[i].id, "number": -1});
-            }
-          }
-          // console.log(JSON.stringify(belowSetup));
-          setBelow(belowSetup);
-          setTotalCandidates(totalCand);
-          setCandidates(candidatesArr);
-        })
-      );
+        }
+        setBelow(belowSetup);
+        setCandidates(candidatesArr);
+      }
+
+      fetchData();
     }
   }, [voting_event])
 
@@ -160,13 +151,7 @@ export default function PartyForm({voting_event, party, party_id}) {
     }
     const newVote = {v_event_id: id, vote_data: {above: submitAbove, below: submitBelow}};
     // console.log(JSON.stringify(newVote));
-		const response = await fetch("/votes/create", {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json"
-			},
-			body: JSON.stringify(newVote)
-		});
+		const response = await create_vote(newVote);
 		if(response.ok) {
 			console.log("Created vote");
 			window.location.replace("/vote/");

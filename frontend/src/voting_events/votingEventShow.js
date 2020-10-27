@@ -5,6 +5,7 @@ import { TextField,Button } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import '../App.css';
 import {withAuthorisation} from "../components/AuthWrapper"
+import { get_event, delete_event, get_event_tally } from '../utils/API'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -36,66 +37,56 @@ function VotingEventShow(props) {
 
   useEffect(() => {
     if(id) {
-      fetch('/voting-events/'+id).then(response =>
-        response.json().then(data => {
-          // Format the data
-          var date = new Date(data.vote_start);
-          var day = ('0' + date.getDate()).slice(-2);
-          var mon = ('0' + (date.getMonth() + 1)).slice(-2);
-          var year = date.getFullYear();
-          var vstart = day + "/" + mon + "/" + year;
-          date = new Date(data.vote_end);
-          day = ('0' + date.getDate()).slice(-2);
-          mon = ('0' + (date.getMonth() + 1)).slice(-2);
-          year = date.getFullYear();
-          var vend = day + "/" + mon + "/" + year;
-          setEventName(data.event_name);
-          setEventYear(data.year);
-          setVoteStart(vstart);
-          setVoteEnd(vend);
-        })
-      );
+      async function fetchData() {
+        var data = await get_event(id);
+        var date = new Date(data.vote_start);
+        var day = ('0' + date.getDate()).slice(-2);
+        var mon = ('0' + (date.getMonth() + 1)).slice(-2);
+        var year = date.getFullYear();
+        var vstart = year + "-" + mon + "-" + day;
+        date = new Date(data.vote_end);
+        day = ('0' + date.getDate()).slice(-2);
+        mon = ('0' + (date.getMonth() + 1)).slice(-2);
+        year = date.getFullYear();
+        var vend = year + "-" + mon + "-" + day;
+        data.vote_start = vstart;
+        data.vote_end = vend;
+        setEventName(data.event_name);
+        setEventYear(data.year);
+        setVoteStart(vstart);
+        setVoteEnd(vend);
+      }
+
+      fetchData();
     }
   }, [])
 
   useEffect(() => {
     if(id) {
-      var party2 = [];
-      var candid2 = [];
-      fetch('/candidates?v_event_id='+id).then(response =>
-        response.json().then(data => {
-          candid2 = data;
-          return fetch('/parties?v_event_id='+id);
-        }).then(function(response) {
-          return response.json();
-        }).then(function(data) {
-          party2 = data;
-          var partyArr = {};
-          partyArr[null] = "No Party";
-          for(var i=0;i<data.length;i++){
-            partyArr[data[i].id] = data[i].party_name;
-          }
-  				setPartiesDict(partyArr);
-          return fetch('/voting-events/'+id+'/tally');
-        }).then(function(response) {
-          return response.json();
-        }).then(function(data) {
-          setTally(data);
-          var parTally = {};
-          var canTally = {};
-          for(var i=0;i<data.above.length;i++){
-            parTally[data.above[i].party_id] = data.above[i].votes;
-          }
-          for(var i=0;i<data.below.length;i++){
-            canTally[data.below[i].candidate_id] = data.below[i].votes;
-          }
-          setPartyTally(parTally);
-          setCandidateTally(canTally);
-          // parties and candidates has to be after tally or it wont render
-          setParties(party2)
-          setCandidates(candid2);;
-        })
-      );
+      async function fetchData() {
+        var data = await get_event_tally(id);
+        var partyArr = {};
+        partyArr[null] = "No Party";
+        for(var i=0;i<data.parties.length;i++){
+          partyArr[data.parties[i].id] = data.parties[i].party_name;
+        }
+        setPartiesDict(partyArr);
+        setTally(data.tally);
+        var parTally = {};
+        var canTally = {};
+        for(var i=0;i<data.tally.above.length;i++){
+          parTally[data.tally.above[i].party_id] = data.tally.above[i].votes;
+        }
+        for(var i=0;i<data.tally.below.length;i++){
+          canTally[data.tally.below[i].candidate_id] = data.tally.below[i].votes;
+        }
+        setPartyTally(parTally);
+        setCandidateTally(canTally);
+        setParties(data.parties);
+        setCandidates(data.candidates);
+      }
+
+      fetchData();
     }
   }, [])
 
@@ -176,9 +167,7 @@ function VotingEventShow(props) {
     <Button variant="contained"
       color="secondary"
       onClick={async() => {
-        const response = await fetch("/voting-events/"+id+"/delete", {
-          method: "DELETE"
-        });
+        const response =  await delete_event(id);
         if(response.ok) {
           console.log("Deleted event");
           window.location.replace("/voting_events");

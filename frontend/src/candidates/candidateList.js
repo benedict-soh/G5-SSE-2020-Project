@@ -1,11 +1,9 @@
-import React, {Component, useEffect, useState} from 'react';
-import NavigationTopBar from '../navigation/NavigationTopBar'
-import {Route, withRouter, Switch, Link} from "react-router-dom";
+import React, {useEffect, useState} from 'react';
+import {Link} from "react-router-dom";
 import { withStyles, makeStyles } from '@material-ui/core/styles';
 import CandidateRows from '../components/candidate_rows'
 import Button from '@material-ui/core/Button';
 import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
@@ -13,6 +11,7 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import '../App.css';
 import {withAuthorisation} from "../components/AuthWrapper"
+import {get_candidates} from "../utils/API"
 
 const StyledTableCell = withStyles((theme) => ({
   head: {
@@ -36,17 +35,17 @@ function CandidateList(props) {
   const classes = useStyles();
 
   useEffect(() => {
-    fetch('/candidates?v_event_id='+id).then(response =>
-      response.json().then(data => {
-				setCandidates(data);
-      })
-    );
-  }, [])
+    async function fetchData(id) {
+      const response = await get_candidates(id);
+      setCandidates(response);
+    }
+    fetchData(id);
+  }, []);
 
 	return(
 			<div style={{ height: 300, width: '100%' }}>
         <h1>Candidates</h1>
-        <Link to={"/voting_events/"+id}>
+        <Link to={`/voting_events/${id}`}>
           <Button variant="contained">
             Back to Event
           </Button>

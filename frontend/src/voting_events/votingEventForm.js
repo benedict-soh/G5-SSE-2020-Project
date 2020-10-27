@@ -5,6 +5,7 @@ import { TextField,Button } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import '../App.css';
 import {withAuthorisation} from "../components/AuthWrapper"
+import { create_event, update_event } from '../utils/API'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -40,13 +41,7 @@ function VotingEventForm({voteEvent, event_id}) {
 
 	const createEvent = async () => {
 		const newEvent = {event_name, year, vote_start, vote_end};
-		const response = await fetch("/voting-events/create", {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json"
-			},
-			body: JSON.stringify(newEvent)
-		});
+		const response = await create_event(newEvent);
 		if(response.ok) {
 			console.log("Created event");
 			window.location.replace("/voting_events");
@@ -57,13 +52,7 @@ function VotingEventForm({voteEvent, event_id}) {
 
 	const updateEvent = async () => {
 		const updateEvent = {event_name, year, vote_start, vote_end};
-		const response = await fetch("/voting-events/"+event_id+"/update", {
-			method: "PUT",
-			headers: {
-				"Content-Type": "application/json"
-			},
-			body: JSON.stringify(updateEvent)
-		});
+		const response = await update_event(event_id, updateEvent);
 		if(response.status == "204") {
 			console.log("Updated event");
 			window.location.replace("/voting_events");
