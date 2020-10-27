@@ -28,7 +28,7 @@ def create_app(test_config=None):
 
     # these two should be set to true in the future.
     # The first adds CSRF (more work for testing), the second forces the cookies to be sent over https (which is currently not supported).
-    app.config['JWT_COOKIE_CSRF_PROTECT'] = False
+    app.config['JWT_COOKIE_CSRF_PROTECT'] = True
     app.config['JWT_COOKIE_SECURE'] = False
 
     # add more blue prints here. "test_page" is the file name, "simple_page" is the blueprint object.

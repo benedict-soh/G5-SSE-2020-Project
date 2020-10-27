@@ -23,12 +23,13 @@ export function withAuthorisation(WrappedComponent, role) {
             }
         };
 
-        componentWillMount() {
+        componentDidMount() {
             this.checkAuth();
             this.checkRole();
         }
 
         checkAuth(){
+            console.log("checking authentication");
             authTest_request()
                 .catch(err => {
                     this.props.logout();
@@ -43,6 +44,7 @@ export function withAuthorisation(WrappedComponent, role) {
         }
 
         checkRole(){
+            console.log("checking authorisation");
             get_role()
                 .catch(err => {
                     this.setState({authorisation: false, loadingAuthorisation: false});
