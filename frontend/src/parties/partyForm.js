@@ -1,8 +1,8 @@
 import React, {Component, useEffect, useState} from 'react';
-import NavigationTopBar from '../navigation/NavigationTopBar'
 import {Route, withRouter, Switch, Link} from "react-router-dom";
 import { TextField,Button,MenuItem } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
+import { create_party, update_party, get_event } from '../utils/API'
 
 import '../App.css';
 
@@ -35,18 +35,19 @@ export default function PartyForm({voting_event, party, party_id}) {
 
 	useEffect(()=>{
 		if(party){
-      console.log(party);
 			setPartyName(party.party_name);
-      fetch('/voting-events/'+party.v_event_id).then(response =>
-        response.json().then(data => {
-  				setEventName(data.event_name);
-          setEventYear(data.year);
-          setVoteStart(data.vote_start);
-          setVoteEnd(data.vote_end);
-          setID(party.v_event_id);
-    			setEventID(party.v_event_id);
-        })
-      );
+
+      async function fetchData() {
+        const data = await get_event(party.v_event_id);
+        setEventName(data.event_name);
+        setEventYear(data.year);
+        setVoteStart(data.vote_start);
+        setVoteEnd(data.vote_end);
+        setID(party.v_event_id);
+        setEventID(party.v_event_id);
+      }
+
+      fetchData();
 		}
 	},[party])
 
@@ -64,13 +65,7 @@ export default function PartyForm({voting_event, party, party_id}) {
 	const createParty = async () => {
 		console.log("Create");
 		const newParty = {party_name, v_event_id: id};
-		const response = await fetch("/parties/create", {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json"
-			},
-			body: JSON.stringify(newParty)
-		});
+		const response = await create_party(newParty);
 		if(response.ok) {
 			console.log("Created party");
 			window.location.replace("/voting_events/"+id+"/parties");
@@ -82,13 +77,7 @@ export default function PartyForm({voting_event, party, party_id}) {
 	const updateParty = async () => {
 		console.log("Update");
 		const updateParty = {party_name, v_event_id: id};
-		const response = await fetch("/parties/"+party_id+"/update", {
-			method: "PUT",
-			headers: {
-				"Content-Type": "application/json"
-			},
-			body: JSON.stringify(updateParty)
-		});
+		const response = await update_party(party_id,updateParty);
 		if(response.status == "204") {
 			console.log("Updated party");
 			window.location.replace("/voting_events/"+id+"/parties");

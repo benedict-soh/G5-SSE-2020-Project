@@ -5,7 +5,7 @@ import { Button } from '@material-ui/core';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableRow from '@material-ui/core/TableRow';
-
+import { delete_event } from '../utils/API'
 
 const StyledTableCell = withStyles((theme) => ({
   head: {
@@ -106,9 +106,7 @@ export default function VotingEventRows({voting_events,voter,allowed_events}){
             <Button variant="contained"
               color="secondary"
               onClick={async() => {
-                const response = await fetch("/voting-events/"+row.id+"/delete", {
-            			method: "DELETE"
-            		});
+                const response = await delete_event(row.id);
             		if(response.ok) {
             			console.log("Deleted event");
             			window.location.replace("/voting_events");

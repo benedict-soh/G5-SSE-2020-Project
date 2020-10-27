@@ -4,6 +4,7 @@ import {Route, withRouter, Switch, useParams} from "react-router-dom";
 import '../App.css';
 import VoteForm from "./voteForm"
 import {withAuthorisation} from "../components/AuthWrapper"
+import { get_event } from '../utils/API'
 
 function VoteCreate(props) {
   const id = props.match.params.id;
@@ -11,11 +12,12 @@ function VoteCreate(props) {
 
   useEffect(() => {
     if(id) {
-      fetch('/voting-events/'+id).then(response =>
-        response.json().then(data => {
-          setVotingEvent(data);
-        })
-      );
+      async function fetchData() {
+        const response = await get_event(id);
+        setVotingEvent(response);
+      }
+
+      fetchData();
     }
   }, [])
 

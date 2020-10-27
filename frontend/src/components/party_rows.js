@@ -5,7 +5,7 @@ import { Button } from '@material-ui/core';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableRow from '@material-ui/core/TableRow';
-
+import { get_events, delete_party } from '../utils/API'
 
 const StyledTableCell = withStyles((theme) => ({
   head: {
@@ -35,15 +35,16 @@ export default function PartyRows({parties }){
   const [voting_events, setVotingEvents] = useState([]);
 
   useEffect(() => {
-    fetch('/voting-events').then(response =>
-      response.json().then(data => {
-        var eventArr = {};
-        for(var i=0;i<data.length;i++){
-          eventArr[data[i].id] = data[i].event_name + ' (' + data[i].year + ')';
-        }
-				setVotingEvents(eventArr);
-      })
-    );
+    async function fetchData() {
+      const data = await get_events();
+      var eventArr = {};
+      for(var i=0;i<data.length;i++){
+        eventArr[data[i].id] = data[i].event_name + ' (' + data[i].year + ')';
+      }
+      setVotingEvents(eventArr);
+    }
+
+    fetchData();
   }, [])
 
   return (
@@ -73,9 +74,7 @@ export default function PartyRows({parties }){
           <Button variant="contained"
             color="secondary"
             onClick={async() => {
-              const response = await fetch("/parties/"+row.id+"/delete", {
-          			method: "DELETE"
-          		});
+              const response = await delete_party(row.id);
           		if(response.ok) {
           			console.log("Deleted party");
           			window.location.replace("/voting_events/"+row.v_event_id+"/parties");

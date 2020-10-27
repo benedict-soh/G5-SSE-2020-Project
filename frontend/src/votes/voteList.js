@@ -13,6 +13,7 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import '../App.css';
 import {withAuthorisation} from "../components/AuthWrapper"
+import { get_events_open, get_events } from '../utils/API'
 
 const StyledTableCell = withStyles((theme) => ({
   head: {
@@ -36,19 +37,21 @@ function VoteList(props) {
   const classes = useStyles();
 
   useEffect(() => {
-    fetch('/voting-events').then(response =>
-      response.json().then(data => {
-				setVotingEvents(data);
-      })
-    );
+    async function fetchData() {
+      const response = await get_events();
+      setVotingEvents(response);
+    }
+
+    fetchData();
   }, [])
 
   useEffect(() => {
-    fetch('/voting-events/open').then(response =>
-      response.json().then(data => {
-				setAllowedEvents(data.v_event_id_list);
-      })
-    );
+    async function fetchData() {
+      const response = await get_events_open();
+      setAllowedEvents(response.v_event_id_list);
+    }
+
+    fetchData();
   }, [])
 
 	return(

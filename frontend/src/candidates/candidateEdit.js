@@ -4,6 +4,7 @@ import {Route, withRouter, Switch, useParams} from "react-router-dom";
 import '../App.css';
 import CandidateForm from "./candidateForm"
 import {withAuthorisation} from "../components/AuthWrapper"
+import { get_candidate } from '../utils/API'
 
 function CandidateEdit(props) {
   const id = props.match.params.id;
@@ -11,12 +12,12 @@ function CandidateEdit(props) {
 
   useEffect(() => {
     if(id) {
-      fetch('/candidates/'+id).then(response =>
-        response.json().then(data => {
-          console.log(data);
-          setCandidate(data);
-        })
-      );
+      async function fetchData() {
+        const response = await get_candidate(id);
+        setCandidate(response);
+      }
+
+      fetchData();
     }
   }, [])
 

@@ -1,8 +1,8 @@
 import React, {Component, useEffect, useState} from 'react';
-import NavigationTopBar from '../navigation/NavigationTopBar'
 import {Route, withRouter, Switch, Link} from "react-router-dom";
 import { TextField,Button,MenuItem } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
+import { create_candidate, update_candidate, get_parties, get_event } from '../utils/API'
 
 import '../App.css';
 
@@ -39,26 +39,24 @@ export default function CandidateForm({voting_event, candidate, candidate_id}) {
 
 	useEffect(()=>{
 		if(candidate){
-      fetch('/parties?v_event_id='+candidate.v_event_id).then(response =>
-        response.json().then(data => {
-          setParties(data);
-          setCandidateName(candidate.candidate_name);
-          setID(candidate.v_event_id);
-          setEventID(candidate.v_event_id);
-          if(candidate.party_id != null) setPartyID(candidate.party_id);
-          else setPartyID(-1);
-          setExclude(candidate.exclude);
-          setCandidateOrder(candidate.candidate_order);
-        })
-      );
-      fetch('/voting-events/'+candidate.v_event_id).then(response =>
-        response.json().then(data => {
-          setEventName(data.event_name);
-          setEventYear(data.year);
-          setVoteStart(data.vote_start);
-          setVoteEnd(data.vote_end);
-        })
-      );
+      async function fetchData() {
+        const partyResponse = await get_parties(candidate.v_event_id);
+        setParties(partyResponse);
+        setCandidateName(candidate.candidate_name);
+        setID(candidate.v_event_id);
+        setEventID(candidate.v_event_id);
+        if(candidate.party_id != null) setPartyID(candidate.party_id);
+        else setPartyID(-1);
+        setExclude(candidate.exclude);
+        setCandidateOrder(candidate.candidate_order);
+        const eventResponse = await get_event(candidate.v_event_id);
+        setEventName(eventResponse.event_name);
+        setEventYear(eventResponse.year);
+        setVoteStart(eventResponse.vote_start);
+        setVoteEnd(eventResponse.vote_end);
+      }
+
+      fetchData();
 		}
 	},[candidate])
 
@@ -70,11 +68,13 @@ export default function CandidateForm({voting_event, candidate, candidate_id}) {
       setEventYear(voting_event.year);
       setVoteStart(voting_event.vote_start);
       setVoteEnd(voting_event.vote_end);
-      fetch('/parties?v_event_id='+voting_event.id).then(response =>
-        response.json().then(data => {
-          setParties(data);
-        })
-      );
+
+      async function fetchData() {
+        const response = await get_parties(voting_event.id);
+        setParties(response);
+      }
+
+      fetchData();
     }
   }, [voting_event])
 
@@ -83,13 +83,7 @@ export default function CandidateForm({voting_event, candidate, candidate_id}) {
     if(exclude == "") useExclude = 0;
 		const newCandidate = {candidate_name, v_event_id: id, party_id, exclude: useExclude, candidate_order: parseInt(candidate_order)};
     if(party_id == -1) delete newCandidate['party_id'];
-		const response = await fetch("/candidates/create", {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json"
-			},
-			body: JSON.stringify(newCandidate)
-		});
+    const response = await create_candidate(newCandidate);
 		if(response.ok) {
 			console.log("Created candidate");
 			window.location.replace("/voting_events/"+id+"/candidates");
@@ -103,13 +97,7 @@ export default function CandidateForm({voting_event, candidate, candidate_id}) {
     if(exclude == "") useExclude = 0;
 		const updateCandidate = {candidate_name, v_event_id: id, party_id, exclude: useExclude, candidate_order: parseInt(candidate_order)};
     if(party_id == -1) delete updateCandidate['party_id'];
-		const response = await fetch("/candidates/"+candidate_id+"/update", {
-			method: "PUT",
-			headers: {
-				"Content-Type": "application/json"
-			},
-			body: JSON.stringify(updateCandidate)
-		});
+    const response = await update_candidate(candidate_id, updateCandidate);
 		if(response.status == "204") {
 			console.log("Updated candidate");
 			window.location.replace("/voting_events/"+id+"/candidates");
